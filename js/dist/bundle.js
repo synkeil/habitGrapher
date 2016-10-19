@@ -65,10 +65,18 @@
 	'use strict';
 
 	var Calendar = function calendarMainObject() {
+	  var _this = this;
+
 	  this.date = new Date();
 	  this.year = this.date.getFullYear();
 	  this.month = this.date.getMonth();
 	  this.day = this.date.getDate();
+
+	  this.init = function () {
+	    _this.year = _this.date.getFullYear();
+	    _this.month = _this.date.getMonth();
+	    _this.day = _this.date.getDate();
+	  };
 	};
 
 	var cal = new Calendar();
@@ -78,16 +86,26 @@
 	var weekArrSrt = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 	var hoursArr = [];
 	var cycle = function cycle(elem, range) {
+	  // cycle elements went out of range
 	  if (elem > range) {
 	    return elem % range;
 	  }
 	  return elem;
 	};
+	var clear = function clearTheDom(elemToClear) {
+	  // clearing the dom element
+	  var elMac = elemToClear;
+	  var newBoxMac = elMac.cloneNode(false);
+	  elMac.parentNode.replaceChild(newBoxMac, elMac);
+	  elMac = newBoxMac;
+	};
 
+	// iteration variables;
 	var i = 0;
 	var j = 0;
 	var k = 0;
 
+	// initiating the hours array
 	for (i = 0; i < 24; i += 1) {
 	  hoursArr.push(i + 'h');
 	}
@@ -103,8 +121,8 @@
 
 	var fancyView = function initInFancyMode() {
 	  // function to set the calendar in fancy mode
+	  leapCheck(1);
 	  monthArr.map(function (x) {
-	    leapCheck(j);
 	    iQ('#macroContent').append('<p> ' + x + ' </p><ul class="month' + j + '" ></ul>');
 	    for (i = 0; i < dayInMonthArray[j]; i += 1) {
 	      cal.date = new Date(cal.year, j, i);
@@ -115,48 +133,67 @@
 	  });
 	};
 
-	var yearView = function initInYearView() {
-	  // function to set the calendar in year view
-	  var elMac = iQ('#macroContent').dom();
-	  var elMic = iQ('#microContent').dom();
-	  var newBoxMac = elMac.cloneNode(false);
-	  var newBoxMic = elMic.cloneNode(false);
+	// function to set the calendar in year view
+	var yearView = function initInYearView(_ref) {
+	  var titleElem = _ref.titleElem;
+	  var contentElem = _ref.contentElem;
+	  var calendarObject = _ref.calendarObject;
 
+	  // check for leap year
+	  leapCheck(1);
+	  // reset iterators
 	  j = 0;
 	  k = 0;
-
-	  elMac.parentNode.replaceChild(newBoxMac, elMac);
-	  elMac = newBoxMac;
-	  elMic.parentNode.replaceChild(newBoxMic, elMic);
-	  elMic = newBoxMic;
+	  // clear the dom
+	  clear(iQ(titleElem).dom());
+	  clear(iQ(contentElem).dom());
 
 	  // append the scope (year/month/week/day)
-	  iQ('#macroContent').append(cal.year);
+	  iQ(titleElem).append(calendarObject.year);
 
 	  monthArr.map(function (x) {
-	    // append the month to the main view
-	    // check for leap year
-	    leapCheck(j);
+	    // iterate over each elem of the array
+	    // set date to current month
+	    calendarObject.date = new Date(calendarObject.year, j, 1);
+	    calendarObject.init();
+	    console.log();
+	    // set the number of the first monday
+	    var prevMonthLen = dayInMonthArray[(j + 11) % 12];
+	    var currentMonthLen = dayInMonthArray[(j + 12) % 12];
+	    var nextMonthLen = dayInMonthArray[(j + 13) % 12];
+	    var sundayToMonday = cycle(calendarObject.date.getDay() + 7, 7) - 1;
+	    var prevMonthDif = prevMonthLen + sundayToMonday;
+	    var curMonthDif = currentMonthLen + sundayToMonday;
+	    var nextMonthDif = nextMonthLen + sundayToMonday;
+	    var strartingDigit = prevMonthDif > prevMonthLen - 1 ? prevMonthLen - (sundayToMonday - 1) : curMonthDif;
+	    var digit = 1;
+	    console.log('the month of ' + monthArr[calendarObject.month] + ' starts on the ' + strartingDigit);
 
-	    cal.date = new Date(cal.year, j, 1);
-	    var strartingDigit = dayInMonthArray[(j + 11) % 12] - cal.date.getDay();
-	    var digit = 0;
+	    //console.log(`in ${calendarObject.date} there are : ${dayInMonthArray[((j + 12) % 12)]} days and the first monday is a : ${strartingDigit}, and there are a total of ${dayInMonthArray[((j + 11) % 12)]} days in the previous month`);
 
-	    console.log('in ' + cal.date + ' there are : ' + dayInMonthArray[(j + 12) % 12] + ' days and the first monday is a : ' + strartingDigit + ', and there are a total of ' + dayInMonthArray[(j + 11) % 12] + ' days in the previous month');
-	    // the actual appending (month cell/ days prep)
-	    iQ('#microContent').append('<div class="monthCell"><p>' + x + '</p><div class="dayLabels"></div><div class="dayDigits"></div></div>');
+	    // appending month cells/ days prep
+	    iQ(contentElem).append('<div class="monthCell"><p>' + x + '</p><div class="dayLabels"></div><div class="dayDigits"></div></div>');
 
+	    // append the weekdays shorthand
 	    weekArrSrt.map(function (y) {
-	      // append the weekdays shorthand
 	      iQ('.dayLabels').eq(j + 1).append('<div>' + y + '</div>');
 	      return weekArrSrt;
 	    });
 
+	    // cycle the days digits
 	    for (k = 0; k < 42; k += 1) {
-	      // append the day's digits
-	      digit = cycle(k + strartingDigit, dayInMonthArray[(j + 12) % 12]);
+	      if (k < sundayToMonday) {
+	        digit = strartingDigit + k;
+	      } else {
+	        digit = cycle(k - (prevMonthLen - strartingDigit), currentMonthLen);
+	      }
+	      if (strartingDigit === 0) {
+	        digit = cycle(k, currentMonthLen);
+	      }
 
-	      cal.date = new Date(cal.year, cal.month, digit);
+	      // set date to current day
+	      calendarObject.date = new Date(calendarObject.year, calendarObject.month, digit);
+	      // append the day's digits
 	      iQ('.dayDigits').eq(j + 1).append('<div>' + digit + '</div>');
 	    }
 	    j += 1;
@@ -164,14 +201,17 @@
 	  });
 	};
 
+	// trigger year mode on click
 	iQ('#yearButton').listen('click', function () {
-	  yearView();
+	  yearView({ titleElem: '#macroContent', contentElem: '#microContent' });
 	});
+	// trigger fancy mode on click
 	iQ('#fancyButton').listen('click', function () {
 	  fancyView();
 	});
 
-	yearView();
+	// default view
+	yearView({ titleElem: '#macroContent', contentElem: '#microContent', calendarObject: cal });
 
 /***/ }
 /******/ ]);
