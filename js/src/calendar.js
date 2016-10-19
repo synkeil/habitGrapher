@@ -1,17 +1,20 @@
-const Calendar = function calendarMainObject() {
-  this.date = new Date();
-  this.year = this.date.getFullYear();
-  this.month = this.date.getMonth();
-  this.day = this.date.getDate();
-
-  this.init = () => {
+class CalState {
+  constructor(label) {
+    this.date = new Date();
     this.year = this.date.getFullYear();
-    this.month = this.date.getMonth();
+    this.month = {
+      name: label,
+      number: this.date.getMonth(),
+      days: [],
+    };
+  }
+  init() {
+    this.year = this.date.getFullYear();
+    this.month.number = this.date.getMonth();
     this.day = this.date.getDate();
-  };
-};
+  }
+}
 
-const cal = new Calendar();
 const monthArr = ['Janvier', 'Fevrier', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 const dayInMonthArray = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const weekArr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
@@ -23,7 +26,16 @@ const cycle = (elem, range) => { // cycle elements went out of range
   }
   return elem;
 };
-const clear = function clearTheDom(elemToClear) { // clearing the dom element
+
+let calArray = {};
+
+// create a new calendar object
+const calStateInit = function populateCurrentYearState() {
+  calArray = new CalState(monthArr);
+};
+
+// clearing the dom element
+const clear = function clearTheDom(elemToClear) {
   let elMac = elemToClear;
   const newBoxMac = elMac.cloneNode(false);
   elMac.parentNode.replaceChild(newBoxMac, elMac);
@@ -40,75 +52,44 @@ for (i = 0; i < 24; i += 1) {
   hoursArr.push(`${i}h`);
 }
 
-const leapCheck = function checkForLeapYear(check) { // Check for leap year and adjust feb days
-  if (check === 1) {
-    if ((cal.year % 4 === 0 && cal.year % 100 !== 0) || cal.year % 400 === 0) {
-      dayInMonthArray[1] = 29;
-    }
+// Check for leap year and adjust feb days
+const leapCheck = function checkForLeapYear() {
+  if ((calArray.year % 4 === 0 && calArray.year % 100 !== 0) || calArray.year % 400 === 0) {
+    dayInMonthArray[1] = 29;
+    console.log('should be 29');
   }
-};
-
-
-const fancyView = function initInFancyMode() { // function to set the calendar in fancy mode
-  leapCheck(1);
-  monthArr.map(
-    (x) => {
-      iQ('#macroContent').append(`<p> ${x} </p><ul class="month${j}" ></ul>`);
-      for (i = 0; i < dayInMonthArray[j]; i += 1) {
-        cal.date = new Date(cal.year, j, i);
-        iQ(`.month${j}`).append(`<li>${weekArr[cal.date.getDay()]} (${i + 1})</li>`);
-      }
-      j += 1;
-      return monthArr;
-    }
-  );
+  console.log('should be 28');
+  console.log(calArray.date);
 };
 
 // function to set the calendar in year view
-const yearView = function initInYearView({ titleElem, contentElem, calendarObject }) {
+const yearInit = function initInYearView() {
   // check for leap year
-  leapCheck(1);
+  calStateInit();
+  leapCheck();
+
   // reset iterators
   j = 0;
   k = 0;
-  // clear the dom
-  clear(iQ(titleElem).dom());
-  clear(iQ(contentElem).dom());
 
-  // append the scope (year/month/week/day)
-  iQ(titleElem).append(calendarObject.year);
-
+  // iterate over each elem of the array
   monthArr.map(
-    (x) => { // iterate over each elem of the array
+    () => {
+      calArray.month.days.push([]);
+
       // set date to current month
-      calendarObject.date = new Date(calendarObject.year, j, 1);
-      calendarObject.init();
-      console.log();
+      calArray.date = new Date(calArray.year, j, 1);
+      calArray.init();
+
       // set the number of the first monday
       const prevMonthLen = dayInMonthArray[((j + 11) % 12)];
       const currentMonthLen = dayInMonthArray[((j + 12) % 12)];
-      const nextMonthLen = dayInMonthArray[((j + 13) % 12)];
-      const sundayToMonday = (cycle((calendarObject.date.getDay() + 7), 7) - 1);
+      const sundayToMonday = (cycle((calArray.date.getDay() + 7), 7) - 1);
       const prevMonthDif = prevMonthLen + sundayToMonday;
       const curMonthDif = currentMonthLen + sundayToMonday;
-      const nextMonthDif = nextMonthLen + sundayToMonday;
       const strartingDigit = prevMonthDif > (prevMonthLen - 1) ?
        (prevMonthLen - (sundayToMonday - 1)) : curMonthDif;
       let digit = 1;
-      console.log(`the month of ${monthArr[calendarObject.month]} starts on the ${strartingDigit}`);
-
-      //console.log(`in ${calendarObject.date} there are : ${dayInMonthArray[((j + 12) % 12)]} days and the first monday is a : ${strartingDigit}, and there are a total of ${dayInMonthArray[((j + 11) % 12)]} days in the previous month`);
-
-      // appending month cells/ days prep
-      iQ(contentElem).append(`<div class="monthCell"><p>${x}</p><div class="dayLabels"></div><div class="dayDigits"></div></div>`);
-
-      // append the weekdays shorthand
-      weekArrSrt.map(
-        (y) => {
-          iQ('.dayLabels').eq(j + 1).append(`<div>${y}</div>`);
-          return weekArrSrt;
-        }
-      );
 
       // cycle the days digits
       for (k = 0; k < 42; k += 1) {
@@ -121,10 +102,12 @@ const yearView = function initInYearView({ titleElem, contentElem, calendarObjec
           digit = cycle(k, currentMonthLen);
         }
 
+        // populate the current month's days array with the appropriate series of numbers
+        calArray.month.days[j].push(digit);
+
         // set date to current day
-        calendarObject.date = new Date(calendarObject.year, calendarObject.month, digit);
-        // append the day's digits
-        iQ('.dayDigits').eq(j + 1).append(`<div>${digit}</div>`);
+        calArray.date = new Date(calArray.year, calArray.month.number, digit);
+        calArray.init();
       }
       j += 1;
       return monthArr;
@@ -132,10 +115,53 @@ const yearView = function initInYearView({ titleElem, contentElem, calendarObjec
   );
 };
 
+const renderYear = function renderTheYearView({ titleElem, contentElem }) {
+  // reset iterators
+  j = 0;
+  k = 0;
+
+  // clear the dom
+  clear(iQ(titleElem).dom());
+  clear(iQ(contentElem).dom());
+
+  // append the scope (year/month/week/day)
+  iQ(titleElem).append(calArray.year);
+
+  // iterate over each exlem of the array
+  calArray.month.name.map(
+    (x) => {
+      // appending month cells/ days prep
+      iQ(contentElem).append(`<div class="monthCell"><p>${x}</p><div class="dayLabels"></div><div class="dayDigits"></div></div>`);
+
+      // append the weekdays shorthand
+      weekArrSrt.map(
+        (y) => {
+          iQ('.dayLabels').eq(j + 1).append(`<div>${y}</div>`);
+          return weekArrSrt;
+        }
+      );
+
+      // cycle the days digits
+      calArray.month.days[j].map((y) => {
+        iQ('.dayDigits').eq(j + 1).append(`<div>${y}</div>`);
+        return calArray.month.days;
+      });
+
+      j += 1;
+      return monthArr;
+    }
+  );
+};
+
+const yearView = function initAndRenderYear({ contentElemSup, titleElemSup }) {
+  yearInit();
+  renderYear({
+    contentElem: contentElemSup, titleElem: titleElemSup,
+  });
+};
+
 // trigger year mode on click
 iQ('#yearButton').listen('click', () => { yearView({ titleElem: '#macroContent', contentElem: '#microContent' }); });
-// trigger fancy mode on click
-iQ('#fancyButton').listen('click', () => { fancyView(); });
 
 // default view
-yearView({ titleElem: '#macroContent', contentElem: '#microContent', calendarObject: cal });
+yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });

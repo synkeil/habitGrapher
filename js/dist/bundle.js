@@ -64,22 +64,35 @@
 
 	'use strict';
 
-	var Calendar = function calendarMainObject() {
-	  var _this = this;
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	  this.date = new Date();
-	  this.year = this.date.getFullYear();
-	  this.month = this.date.getMonth();
-	  this.day = this.date.getDate();
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	  this.init = function () {
-	    _this.year = _this.date.getFullYear();
-	    _this.month = _this.date.getMonth();
-	    _this.day = _this.date.getDate();
-	  };
-	};
+	var CalState = function () {
+	  function CalState(label) {
+	    _classCallCheck(this, CalState);
 
-	var cal = new Calendar();
+	    this.date = new Date();
+	    this.year = this.date.getFullYear();
+	    this.month = {
+	      name: label,
+	      number: this.date.getMonth(),
+	      days: []
+	    };
+	  }
+
+	  _createClass(CalState, [{
+	    key: 'init',
+	    value: function init() {
+	      this.year = this.date.getFullYear();
+	      this.month.number = this.date.getMonth();
+	      this.day = this.date.getDate();
+	    }
+	  }]);
+
+	  return CalState;
+	}();
+
 	var monthArr = ['Janvier', 'Fevrier', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 	var dayInMonthArray = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 	var weekArr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
@@ -92,8 +105,16 @@
 	  }
 	  return elem;
 	};
+
+	var calArray = {};
+
+	// create a new calendar object
+	var calStateInit = function populateCurrentYearState() {
+	  calArray = new CalState(monthArr);
+	};
+
+	// clearing the dom element
 	var clear = function clearTheDom(elemToClear) {
-	  // clearing the dom element
 	  var elMac = elemToClear;
 	  var newBoxMac = elMac.cloneNode(false);
 	  elMac.parentNode.replaceChild(newBoxMac, elMac);
@@ -110,75 +131,42 @@
 	  hoursArr.push(i + 'h');
 	}
 
-	var leapCheck = function checkForLeapYear(check) {
-	  // Check for leap year and adjust feb days
-	  if (check === 1) {
-	    if (cal.year % 4 === 0 && cal.year % 100 !== 0 || cal.year % 400 === 0) {
-	      dayInMonthArray[1] = 29;
-	    }
+	// Check for leap year and adjust feb days
+	var leapCheck = function checkForLeapYear() {
+	  if (calArray.year % 4 === 0 && calArray.year % 100 !== 0 || calArray.year % 400 === 0) {
+	    dayInMonthArray[1] = 29;
+	    console.log('should be 29');
 	  }
-	};
-
-	var fancyView = function initInFancyMode() {
-	  // function to set the calendar in fancy mode
-	  leapCheck(1);
-	  monthArr.map(function (x) {
-	    iQ('#macroContent').append('<p> ' + x + ' </p><ul class="month' + j + '" ></ul>');
-	    for (i = 0; i < dayInMonthArray[j]; i += 1) {
-	      cal.date = new Date(cal.year, j, i);
-	      iQ('.month' + j).append('<li>' + weekArr[cal.date.getDay()] + ' (' + (i + 1) + ')</li>');
-	    }
-	    j += 1;
-	    return monthArr;
-	  });
+	  console.log('should be 28');
+	  console.log(calArray.date);
 	};
 
 	// function to set the calendar in year view
-	var yearView = function initInYearView(_ref) {
-	  var titleElem = _ref.titleElem;
-	  var contentElem = _ref.contentElem;
-	  var calendarObject = _ref.calendarObject;
-
+	var yearInit = function initInYearView() {
 	  // check for leap year
-	  leapCheck(1);
+	  calStateInit();
+	  leapCheck();
+
 	  // reset iterators
 	  j = 0;
 	  k = 0;
-	  // clear the dom
-	  clear(iQ(titleElem).dom());
-	  clear(iQ(contentElem).dom());
 
-	  // append the scope (year/month/week/day)
-	  iQ(titleElem).append(calendarObject.year);
+	  // iterate over each elem of the array
+	  monthArr.map(function () {
+	    calArray.month.days.push([]);
 
-	  monthArr.map(function (x) {
-	    // iterate over each elem of the array
 	    // set date to current month
-	    calendarObject.date = new Date(calendarObject.year, j, 1);
-	    calendarObject.init();
-	    console.log();
+	    calArray.date = new Date(calArray.year, j, 1);
+	    calArray.init();
+
 	    // set the number of the first monday
 	    var prevMonthLen = dayInMonthArray[(j + 11) % 12];
 	    var currentMonthLen = dayInMonthArray[(j + 12) % 12];
-	    var nextMonthLen = dayInMonthArray[(j + 13) % 12];
-	    var sundayToMonday = cycle(calendarObject.date.getDay() + 7, 7) - 1;
+	    var sundayToMonday = cycle(calArray.date.getDay() + 7, 7) - 1;
 	    var prevMonthDif = prevMonthLen + sundayToMonday;
 	    var curMonthDif = currentMonthLen + sundayToMonday;
-	    var nextMonthDif = nextMonthLen + sundayToMonday;
 	    var strartingDigit = prevMonthDif > prevMonthLen - 1 ? prevMonthLen - (sundayToMonday - 1) : curMonthDif;
 	    var digit = 1;
-	    console.log('the month of ' + monthArr[calendarObject.month] + ' starts on the ' + strartingDigit);
-
-	    //console.log(`in ${calendarObject.date} there are : ${dayInMonthArray[((j + 12) % 12)]} days and the first monday is a : ${strartingDigit}, and there are a total of ${dayInMonthArray[((j + 11) % 12)]} days in the previous month`);
-
-	    // appending month cells/ days prep
-	    iQ(contentElem).append('<div class="monthCell"><p>' + x + '</p><div class="dayLabels"></div><div class="dayDigits"></div></div>');
-
-	    // append the weekdays shorthand
-	    weekArrSrt.map(function (y) {
-	      iQ('.dayLabels').eq(j + 1).append('<div>' + y + '</div>');
-	      return weekArrSrt;
-	    });
 
 	    // cycle the days digits
 	    for (k = 0; k < 42; k += 1) {
@@ -191,13 +179,62 @@
 	        digit = cycle(k, currentMonthLen);
 	      }
 
+	      // populate the current month's days array with the appropriate series of numbers
+	      calArray.month.days[j].push(digit);
+
 	      // set date to current day
-	      calendarObject.date = new Date(calendarObject.year, calendarObject.month, digit);
-	      // append the day's digits
-	      iQ('.dayDigits').eq(j + 1).append('<div>' + digit + '</div>');
+	      calArray.date = new Date(calArray.year, calArray.month.number, digit);
+	      calArray.init();
 	    }
 	    j += 1;
 	    return monthArr;
+	  });
+	};
+
+	var renderYear = function renderTheYearView(_ref) {
+	  var titleElem = _ref.titleElem;
+	  var contentElem = _ref.contentElem;
+
+	  // reset iterators
+	  j = 0;
+	  k = 0;
+
+	  // clear the dom
+	  clear(iQ(titleElem).dom());
+	  clear(iQ(contentElem).dom());
+
+	  // append the scope (year/month/week/day)
+	  iQ(titleElem).append(calArray.year);
+
+	  // iterate over each exlem of the array
+	  calArray.month.name.map(function (x) {
+	    // appending month cells/ days prep
+	    iQ(contentElem).append('<div class="monthCell"><p>' + x + '</p><div class="dayLabels"></div><div class="dayDigits"></div></div>');
+
+	    // append the weekdays shorthand
+	    weekArrSrt.map(function (y) {
+	      iQ('.dayLabels').eq(j + 1).append('<div>' + y + '</div>');
+	      return weekArrSrt;
+	    });
+
+	    // cycle the days digits
+	    calArray.month.days[j].map(function (y) {
+	      iQ('.dayDigits').eq(j + 1).append('<div>' + y + '</div>');
+	      return calArray.month.days;
+	    });
+
+	    j += 1;
+	    return monthArr;
+	  });
+	};
+
+	var yearView = function initAndRenderYear(_ref2) {
+	  var contentElemSup = _ref2.contentElemSup;
+	  var titleElemSup = _ref2.titleElemSup;
+
+	  yearInit();
+	  renderYear({
+	    contentElem: contentElemSup, titleElem: titleElemSup
 	  });
 	};
 
@@ -205,13 +242,9 @@
 	iQ('#yearButton').listen('click', function () {
 	  yearView({ titleElem: '#macroContent', contentElem: '#microContent' });
 	});
-	// trigger fancy mode on click
-	iQ('#fancyButton').listen('click', function () {
-	  fancyView();
-	});
 
 	// default view
-	yearView({ titleElem: '#macroContent', contentElem: '#microContent', calendarObject: cal });
+	yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
 
 /***/ }
 /******/ ]);
