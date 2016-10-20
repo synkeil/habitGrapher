@@ -1,24 +1,19 @@
 module.exports = {
-    entry:{
-      'source':__dirname+'/js/src/app.js'
-    },
-    output:{
-      path: __dirname+'/js/dist/',
-      filename: 'bundle.js'
-    }
+  entry: {
+    'source': __dirname+'/js/src/app.js',
+  },
+  output:{
+    path: __dirname+'/js/dist/',
+    filename: 'bundle.js'
+  }
   ,
   module: {
     loaders:[
       {
-        test:/\.js$/,
+        test: /\.js$/,
         exclude: /node_modules/,
-        loader:'babel-loader',
-        query: {
-          presets: ['es2015']
-        }
+        loader: "babel-loader"
       }
     ]
-  },externals: {
-    iQ: "./js/dist/iQ"
   }
 }

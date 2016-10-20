@@ -1,2 +1,2 @@
-import './main.js';
-import './calendar.js'
+import './main';
+import './calendar';
