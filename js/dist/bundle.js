@@ -74,6 +74,7 @@
 
 	    this.date = new Date();
 	    this.year = this.date.getFullYear();
+	    this.refDate = new Date(this.year, 0, 1);
 	    this.month = {
 	      name: label,
 	      number: this.date.getMonth(),
@@ -153,16 +154,16 @@
 	    }
 	  }
 	};
+
+	calStateInit();
 	// trigger year mode on click
-	iQ('#yearButton').listen('click', function () {
-	  yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
-	});
-	iQ('#monthButton').listen('click', function () {
-	  monthView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
-	});
+	// iQ('#yearButton').listen('click', () => { yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' }); });
+	// iQ('#monthButton').listen('click', () => { monthView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' }); });
 
 	// default view
-	yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+	// yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+
+	console.log(calArray);
 
 /***/ }
 /******/ ]);
