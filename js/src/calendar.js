@@ -2,10 +2,9 @@ class CalState {
   constructor(label) {
     this.date = new Date();
     this.year = this.date.getFullYear();
-    this.refDate = new Date(this.year,0,1);
+    this.refDate = new Date(this.year, 0, 1);
     this.month = {
       name: label,
-      number: this.date.getMonth(),
       days: [],
       day: [],
     };
@@ -13,7 +12,6 @@ class CalState {
   }
   init() {
     this.year = this.date.getFullYear();
-    this.month.number = this.date.getMonth();
   }
   setArrays() {
     for (let m = 0; m < 12; m += 1) {
@@ -75,7 +73,29 @@ const leapCheck = function checkForLeapYear(check) {
   }
 };
 
-calStateInit();
+const populate = function populateCalendar() {
+  j = 0;
+  calArray.month.name.map(
+    () => {
+      calArray.refDate.setMonth(j);
+      calArray.refDate.setDate(1);
+      calArray.month.days[j].push([]);
+      calArray.month.day[j].push([]);
+      calArray.dayName[j].push([]);
+      j += 1;
+      return calArray;
+    }
+  );
+};
+
+const build = function initiatAndRenderDocument() {
+  calStateInit();
+  leapCheck();
+  populate();
+};
+
+build();
+
 // trigger year mode on click
 // iQ('#yearButton').listen('click', () => { yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' }); });
 // iQ('#monthButton').listen('click', () => { monthView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' }); });

@@ -77,7 +77,6 @@
 	    this.refDate = new Date(this.year, 0, 1);
 	    this.month = {
 	      name: label,
-	      number: this.date.getMonth(),
 	      days: [],
 	      day: []
 	    };
@@ -88,7 +87,6 @@
 	    key: 'init',
 	    value: function init() {
 	      this.year = this.date.getFullYear();
-	      this.month.number = this.date.getMonth();
 	    }
 	  }, {
 	    key: 'setArrays',
@@ -155,7 +153,27 @@
 	  }
 	};
 
-	calStateInit();
+	var populate = function populateCalendar() {
+	  j = 0;
+	  calArray.month.name.map(function () {
+	    calArray.refDate.setMonth(j);
+	    calArray.refDate.setDate(1);
+	    calArray.month.days[j].push([]);
+	    calArray.month.day[j].push([]);
+	    calArray.dayName[j].push([]);
+	    j += 1;
+	    return calArray;
+	  });
+	};
+
+	var build = function initiatAndRenderDocument() {
+	  calStateInit();
+	  leapCheck();
+	  populate();
+	};
+
+	build();
+
 	// trigger year mode on click
 	// iQ('#yearButton').listen('click', () => { yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' }); });
 	// iQ('#monthButton').listen('click', () => { monthView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' }); });
