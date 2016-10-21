@@ -43,12 +43,12 @@ let k = 0;
 let l = 0;
 
 // the calendar object instence recipient
-let calArray = {};
+let calInstence = {};
 
 // create a new calendar object
 const calStateInit = function populateCurrentYearState() {
-  calArray = new CalState(monthArr);
-  calArray.setArrays();
+  calInstence = new CalState(monthArr);
+  calInstence.setArrays();
 };
 
 // initiating the hours array
@@ -67,23 +67,39 @@ const clear = function clearTheDom(elemToClear) {
 // Check for leap year and adjust feb days
 const leapCheck = function checkForLeapYear(check) {
   if (check === 1) {
-    if ((calArray.year % 4 === 0 && calArray.year % 100 !== 0) || calArray.year % 400 === 0) {
+    if (
+      (calInstence.year % 4 === 0 && calInstence.year % 100 !== 0) ||
+      calInstence.year % 400 === 0) {
       dayInMonthArray[1] = 29;
+    } else {
+      dayInMonthArray[1] = 28;
     }
   }
 };
 
 const populate = function populateCalendar() {
   j = 0;
-  calArray.month.name.map(
+  // set up the arrays in the month (12 arrays of days/names/day)
+  calInstence.month.name.map(
     () => {
-      calArray.refDate.setMonth(j);
-      calArray.refDate.setDate(1);
-      calArray.month.days[j].push([]);
-      calArray.month.day[j].push([]);
-      calArray.dayName[j].push([]);
+      leapCheck(1);
+      calInstence.refDate.setMonth(j);
+      calInstence.refDate.setDate(0);
+      calInstence.month.days[j].push([]);
+      calInstence.month.day[j].push([]);
+      calInstence.dayName[j].push([]);
+      for (i = 0; i < (dayInMonthArray[j]); i += 1) {
+        // increment the reference day
+        calInstence.refDate.setDate(i + 1);
+        // set the date's digit of the current day
+        calInstence.month.days[j][i] = i + 1;
+        // set the day of the week of the current day
+        calInstence.month.day[j][i] = calInstence.refDate.getDay();
+        // set the label of the current day
+        calInstence.dayName[j][i] = weekArr[calInstence.refDate.getDay()];
+      }
       j += 1;
-      return calArray;
+      return calInstence;
     }
   );
 };
@@ -103,4 +119,4 @@ build();
 // default view
 // yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
 
-console.log(calArray);
+console.log(calInstence);

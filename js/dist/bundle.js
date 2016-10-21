@@ -123,12 +123,12 @@
 	var l = 0;
 
 	// the calendar object instence recipient
-	var calArray = {};
+	var calInstence = {};
 
 	// create a new calendar object
 	var calStateInit = function populateCurrentYearState() {
-	  calArray = new CalState(monthArr);
-	  calArray.setArrays();
+	  calInstence = new CalState(monthArr);
+	  calInstence.setArrays();
 	};
 
 	// initiating the hours array
@@ -147,22 +147,36 @@
 	// Check for leap year and adjust feb days
 	var leapCheck = function checkForLeapYear(check) {
 	  if (check === 1) {
-	    if (calArray.year % 4 === 0 && calArray.year % 100 !== 0 || calArray.year % 400 === 0) {
+	    if (calInstence.year % 4 === 0 && calInstence.year % 100 !== 0 || calInstence.year % 400 === 0) {
 	      dayInMonthArray[1] = 29;
+	    } else {
+	      dayInMonthArray[1] = 28;
 	    }
 	  }
 	};
 
 	var populate = function populateCalendar() {
 	  j = 0;
-	  calArray.month.name.map(function () {
-	    calArray.refDate.setMonth(j);
-	    calArray.refDate.setDate(1);
-	    calArray.month.days[j].push([]);
-	    calArray.month.day[j].push([]);
-	    calArray.dayName[j].push([]);
+	  // set up the arrays in the month (12 arrays of days/names/day)
+	  calInstence.month.name.map(function () {
+	    leapCheck(1);
+	    calInstence.refDate.setMonth(j);
+	    calInstence.refDate.setDate(0);
+	    calInstence.month.days[j].push([]);
+	    calInstence.month.day[j].push([]);
+	    calInstence.dayName[j].push([]);
+	    for (i = 0; i < dayInMonthArray[j]; i += 1) {
+	      // increment the reference day
+	      calInstence.refDate.setDate(i + 1);
+	      // set the date's digit of the current day
+	      calInstence.month.days[j][i] = i + 1;
+	      // set the day of the week of the current day
+	      calInstence.month.day[j][i] = calInstence.refDate.getDay();
+	      // set the label of the current day
+	      calInstence.dayName[j][i] = weekArr[calInstence.refDate.getDay()];
+	    }
 	    j += 1;
-	    return calArray;
+	    return calInstence;
 	  });
 	};
 
@@ -181,7 +195,7 @@
 	// default view
 	// yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
 
-	console.log(calArray);
+	console.log(calInstence);
 
 /***/ }
 /******/ ]);
