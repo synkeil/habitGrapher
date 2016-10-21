@@ -123,12 +123,12 @@
 	var l = 0;
 
 	// the calendar object instence recipient
-	var calInstence = {};
+	var calInstance = {};
 
 	// create a new calendar object
 	var calStateInit = function populateCurrentYearState() {
-	  calInstence = new CalState(monthArr);
-	  calInstence.setArrays();
+	  calInstance = new CalState(monthArr);
+	  calInstance.setArrays();
 	};
 
 	// initiating the hours array
@@ -147,7 +147,7 @@
 	// Check for leap year and adjust feb days
 	var leapCheck = function checkForLeapYear(check) {
 	  if (check === 1) {
-	    if (calInstence.year % 4 === 0 && calInstence.year % 100 !== 0 || calInstence.year % 400 === 0) {
+	    if (calInstance.year % 4 === 0 && calInstance.year % 100 !== 0 || calInstance.year % 400 === 0) {
 	      dayInMonthArray[1] = 29;
 	    } else {
 	      dayInMonthArray[1] = 28;
@@ -158,35 +158,77 @@
 	var populate = function populateCalendar() {
 	  j = 0;
 	  // set up the arrays in the month (12 arrays of days/names/day)
-	  calInstence.month.name.map(function () {
+	  calInstance.month.name.map(function () {
 	    leapCheck(1);
-	    calInstence.refDate.setMonth(j);
-	    calInstence.refDate.setDate(0);
-	    calInstence.month.days[j].push([]);
-	    calInstence.month.day[j].push([]);
-	    calInstence.dayName[j].push([]);
+	    calInstance.refDate.setMonth(j);
+	    calInstance.refDate.setDate(0);
+	    calInstance.month.days[j].push([]);
+	    calInstance.month.day[j].push([]);
+	    calInstance.dayName[j].push([]);
 	    for (i = 0; i < dayInMonthArray[j]; i += 1) {
 	      // increment the reference day
-	      calInstence.refDate.setDate(i + 1);
+	      calInstance.refDate.setDate(i + 1);
 	      // set the date's digit of the current day
-	      calInstence.month.days[j][i] = i + 1;
+	      calInstance.month.days[j][i] = i + 1;
 	      // set the day of the week of the current day
-	      calInstence.month.day[j][i] = calInstence.refDate.getDay();
+	      calInstance.month.day[j][i] = calInstance.refDate.getDay();
 	      // set the label of the current day
-	      calInstence.dayName[j][i] = weekArr[calInstence.refDate.getDay()];
+	      calInstance.dayName[j][i] = weekArr[calInstance.refDate.getDay()];
 	    }
 	    j += 1;
-	    return calInstence;
+	    return calInstance;
 	  });
 	};
 
-	var build = function initiatAndRenderDocument() {
+	var renderY = function renderTheFullYear(_ref) {
+	  var titleElemSup = _ref.titleElemSup;
+	  var contentElemSup = _ref.contentElemSup;
+
+	  // append the year to the title bar
+	  iQ(titleElemSup).append(calInstance.year);
+
+	  // append the months
+	  calInstance.month.name.map(function (x) {
+	    k = 0;
+	    iQ(contentElemSup).append('<div class="monthCell"><p>' + x + '</p><div class="dayLabels"></div><div class="dayDigits"></div></div>');
+	    weekArrSrt.map(function (y) {
+	      iQ('.dayLabels').eq(k).append(y);
+	      k += 1;
+	      return weekArrSrt;
+	    });
+	    return calInstance.month.name;
+	  });
+	};
+
+	var build = function initiatAndRenderDocument(_ref2) {
+	  var title = _ref2.title;
+	  var content = _ref2.content;
+
 	  calStateInit();
 	  leapCheck();
 	  populate();
+	  renderY({ titleElemSup: title, contentElemSup: content });
 	};
 
-	build();
+	var yearView = function initAndDisplayFullYear(_ref3) {
+	  var titleElemSup = _ref3.titleElemSup;
+	  var contentElemSup = _ref3.contentElemSup;
+
+	  // reset the dom
+	  clear(titleElemSup);
+	  clear(contentElemSup);
+	};
+
+	var monthView = function initAndDisplayMonth(_ref4) {
+	  var titleElemSup = _ref4.titleElemSup;
+	  var contentElemSup = _ref4.contentElemSup;
+
+	  // reset the dom
+	  clear(titleElemSup);
+	  clear(contentElemSup);
+	};
+
+	build({ title: '#macroContent', content: '#microContent' });
 
 	// trigger year mode on click
 	// iQ('#yearButton').listen('click', () => { yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' }); });
@@ -195,7 +237,7 @@
 	// default view
 	// yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
 
-	console.log(calInstence);
+	console.log(calInstance);
 
 /***/ }
 /******/ ]);
