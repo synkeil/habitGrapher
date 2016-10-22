@@ -5,8 +5,10 @@ class CalState {
     this.refDate = new Date(this.year, 0, 1);
     this.month = {
       name: label,
+      number: [],
       days: [],
       day: [],
+      monthCellLayout: [],
     };
     this.dayName = [];
   }
@@ -15,6 +17,8 @@ class CalState {
   }
   setArrays() {
     for (let m = 0; m < 12; m += 1) {
+      this.month.monthCellLayout.push([]);
+      this.month.number.push(m);
       this.month.days.push([]);
       this.month.day.push([]);
       this.dayName.push([]);
@@ -40,7 +44,13 @@ const cycle = (elem, range) => {
 let i = 0;
 let j = 0;
 let k = 0;
-let l = 0;
+// let l = 0;
+let count = 0;
+
+// initiating the hours array
+for (i = 0; i < 24; i += 1) {
+  hoursArr.push(`${i}h`);
+}
 
 // the calendar object instence recipient
 let calInstance = {};
@@ -50,11 +60,6 @@ const calStateInit = function populateCurrentYearState() {
   calInstance = new CalState(monthArr);
   calInstance.setArrays();
 };
-
-// initiating the hours array
-for (i = 0; i < 24; i += 1) {
-  hoursArr.push(`${i}h`);
-}
 
 // clearing the dom element
 const clear = function clearTheDom(elemToClear) {
@@ -77,27 +82,54 @@ const leapCheck = function checkForLeapYear(check) {
   }
 };
 
-const populate = function populateCalendar() {
+const populate = function initAndAssignFullCalendar() {
+  // shorthands
+  const mLayout = calInstance.month.monthCellLayout;
+  const days = calInstance.month.days;
+  const day = calInstance.month.day;
+  const dayName = calInstance.dayName;
+
+  // set the year dynamicly
+  calInstance.refDate.setFullYear(calInstance.year + count);
+
   j = 0;
+
   // set up the arrays in the month (12 arrays of days/names/day)
   calInstance.month.name.map(
     () => {
       leapCheck(1);
+
+      // setup the arrays
       calInstance.refDate.setMonth(j);
       calInstance.refDate.setDate(0);
-      calInstance.month.days[j].push([]);
-      calInstance.month.day[j].push([]);
-      calInstance.dayName[j].push([]);
+      days[j].push([]);
+      day[j].push([]);
+      dayName[j].push([]);
+
       for (i = 0; i < (dayInMonthArray[j]); i += 1) {
         // increment the reference day
         calInstance.refDate.setDate(i + 1);
         // set the date's digit of the current day
-        calInstance.month.days[j][i] = i + 1;
+        days[j][i] = i + 1;
         // set the day of the week of the current day
-        calInstance.month.day[j][i] = calInstance.refDate.getDay();
+        day[j][i] = calInstance.refDate.getDay();
         // set the label of the current day
-        calInstance.dayName[j][i] = weekArr[calInstance.refDate.getDay()];
+        dayName[j][i] = weekArr[calInstance.refDate.getDay()];
       }
+
+      const startingDate = day[j][0];
+
+      let digit = 0;
+      for (k = 0; k < 42; k += 1) {
+        // check month for congruence
+        if (startingDate > k) {
+          digit = (dayInMonthArray[(cycle((j + 11), 11))] - (startingDate - (k - 1)));
+        } else {
+          digit = days[j][cycle(k, (dayInMonthArray[j] - 1))];
+        }
+        mLayout[j].push(digit);
+      }
+
       j += 1;
       return calInstance;
     }
@@ -105,22 +137,39 @@ const populate = function populateCalendar() {
 };
 
 const renderY = function renderTheFullYear({ titleElemSup, contentElemSup }) {
+  // shorthands
+  const mLayout = calInstance.month.monthCellLayout;
+
+  // reset iterators
+  j = 0;
+  k = 0;
+
   // append the year to the title bar
-  iQ(titleElemSup).append(calInstance.year);
+  $(titleElemSup).append(calInstance.year);
 
   // append the months
-  calInstance.month.name.map(
+  monthArr.map(
     (x) => {
-      k = 0;
-      iQ(contentElemSup).append(`<div class="monthCell"><p>${x}</p><div class="dayLabels"></div><div class="dayDigits"></div></div>`);
+      // append the months name and prepare the dom for the rest
+      $(contentElemSup).append(`<div class="monthCell"><p>${x}</p><div class="dayLabels"></div><div class="dayDigits"></div></div>`);
+
+      // append the day shorthand to the calendar
       weekArrSrt.map(
         (y) => {
-          iQ('.dayLabels').eq(k).append(y);
-          k += 1;
+          $('.dayLabels').eq(j + 1).append(`<div>${y}</div>`);
           return weekArrSrt;
         }
       );
-      return calInstance.month.name;
+
+      // append the date to the calendar
+      mLayout[j].map(
+        (z) => {
+          $('.dayDigits').eq(j + 1).append(`<div>${z}</div>`);
+          return mLayout[j];
+        }
+      );
+      j += 1;
+      return monthArr;
     }
   );
 };
@@ -144,13 +193,24 @@ const monthView = function initAndDisplayMonth({ titleElemSup, contentElemSup })
   clear(contentElemSup);
 };
 
+// counter management
+const countUp = function setYearCounterUp() {
+  count += 1;
+};
+const countDown = function setYearCounterDown() {
+  count -= 1;
+};
 build({ title: '#macroContent', content: '#microContent' });
 
 // trigger year mode on click
-// iQ('#yearButton').listen('click', () => { yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' }); });
-// iQ('#monthButton').listen('click', () => { monthView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' }); });
+$('#yearButton').listen('click', () => { yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' }); });
 
+// trigger month mode on click
+$('#monthButton').listen('click', () => { monthView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' }); });
+
+// cycle year/month on click
+$('#prev').listen('click', () => { countDown(); });
+$('#next').listen('click', () => { countUp(); });
 // default view
 // yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
-
 console.log(calInstance);

@@ -1,0 +1,1 @@
+import iQ from './ignisQuery'
