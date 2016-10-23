@@ -1,1 +1,1 @@
-import iQ from './ignisQuery'
+import $ from './ignisQuery'

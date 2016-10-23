@@ -1,4 +1,4 @@
-const iQ = function ignisQuery(mainSelector, subSelector) {
+function iQ(mainSelector, subSelector) {
   // seting up shorthands
   let mainS = mainSelector || null;
   let subS = subSelector || null;
@@ -193,8 +193,5 @@ const iQ = function ignisQuery(mainSelector, subSelector) {
       xmlhttp.send(data);
     }
   };
-
   return this;
-};
-
-const $ = function returnShorthand(select) { return iQ(select); };
+}

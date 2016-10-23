@@ -1,5 +1,3 @@
-'use strict';
-
 function iQ(mainSelector, subSelector) {
   // seting up shorthands
   var mainS = mainSelector || null;

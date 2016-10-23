@@ -179,12 +179,28 @@
 	    var startingDate = day[j][0];
 
 	    var digit = 0;
-	    for (k = 0; k < 42; k += 1) {
+	    for (k = 0; k < 40; k += 1) {
 	      // check month for congruence
-	      if (startingDate > k) {
-	        digit = dayInMonthArray[cycle(j + 11, 11)] - (startingDate - (k - 1));
-	      } else {
-	        digit = days[j][cycle(k, dayInMonthArray[j] - 1)];
+	      switch (true) {
+	        // where k goes over the max # of days in the current month
+	        case k > dayInMonthArray[j] - startingDate:
+	          if (j === 11) {
+	            digit = days[0][k - dayInMonthArray[11] - (startingDate + 1)];
+	          } else {
+	            digit = days[j + 1][0];
+	            console.log(days[j + 1][1]);
+	          }
+	          break;
+	        // where the first day to display is from the previous month
+	        // case ((startingDate + 1) > k):
+	        //   if (j === 0) {
+	        //     digit = days[11][(dayInMonthArray[11] - (startingDate)) + k];
+	        //   } else {
+	        //     digit = days[j - 1][(dayInMonthArray[j - 1] - (startingDate)) + k];
+	        //   }
+	        //   break;
+	        default:
+	        //   digit = days[j][k - (startingDate)];
 	      }
 	      mLayout[j].push(digit);
 	    }
