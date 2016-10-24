@@ -1,6 +1,4 @@
-'use strict';
-
-function iQ(mainSelector, subSelector) {
+function $(mainSelector, subSelector) {
   // seting up shorthands
   var mainS = mainSelector || null;
   var subS = subSelector || null;

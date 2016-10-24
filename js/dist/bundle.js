@@ -50,44 +50,6 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var CalState = function () {
-	  function CalState(label) {
-	    _classCallCheck(this, CalState);
-
-	    this.date = new Date();
-	    this.year = this.date.getFullYear();
-	    this.refDate = new Date(this.year, 0, 1);
-	    this.month = {
-	      name: label,
-	      number: [],
-	      days: [],
-	      day: [],
-	      monthCellLayout: []
-	    };
-	    this.dayName = [];
-	  }
-
-	  _createClass(CalState, [{
-	    key: 'init',
-	    value: function init() {
-	      this.year = this.date.getFullYear();
-	    }
-	  }, {
-	    key: 'setArrays',
-	    value: function setArrays() {
-	      for (var m = 0; m < 12; m += 1) {
-	        this.month.monthCellLayout.push([]);
-	        this.month.number.push(m);
-	        this.month.days.push([]);
-	        this.month.day.push([]);
-	        this.dayName.push([]);
-	      }
-	    }
-	  }]);
-
-	  return CalState;
-	}();
-
 	var monthArr = ['Janvier', 'Fevrier', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 	var dayInMonthArray = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 	var weekArr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
@@ -107,21 +69,12 @@
 	var j = 0;
 	var k = 0;
 	// let l = 0;
-	var count = 0;
+	var count = 30;
 
 	// initiating the hours array
 	for (i = 0; i < 24; i += 1) {
 	  hoursArr.push(i + 'h');
 	}
-
-	// the calendar object instence recipient
-	var calInstance = {};
-
-	// create a new calendar object
-	var calStateInit = function populateCurrentYearState() {
-	  calInstance = new CalState(monthArr);
-	  calInstance.setArrays();
-	};
 
 	// clearing the dom element
 	var clear = function clearTheDom(elemToClear) {
@@ -131,98 +84,96 @@
 	  elMac = newBoxMac;
 	};
 
-	// Check for leap year and adjust feb days
-	var leapCheck = function checkForLeapYear(check) {
-	  if (check === 1) {
-	    if (calInstance.year % 4 === 0 && calInstance.year % 100 !== 0 || calInstance.year % 400 === 0) {
+	var calLib = [];
+
+	var ref = new Date();
+
+	var CalYear = function () {
+	  function CalYear(dateSet) {
+	    _classCallCheck(this, CalYear);
+
+	    this.date = dateSet;
+	    this.year = ref.getFullYear();
+	    this.days = [];
+	    this.day = [];
+	    this.dayName = [];
+	  }
+
+	  _createClass(CalYear, [{
+	    key: 'init',
+	    value: function init() {
+	      this.year = this.date.getFullYear();
+	    }
+	  }, {
+	    key: 'setArrays',
+	    value: function setArrays() {
+	      for (var m = 0; m < 12; m += 1) {
+	        this.days.push([]);
+	        this.day.push([]);
+	        this.dayName.push([]);
+	      }
+	    }
+	  }]);
+
+	  return CalYear;
+	}();
+
+	function dateFull(counter) {
+	  for (i = 0; i < 60; i += 1) {
+	    // populate the array with objects at date -/+ 30
+	    calLib.push(new CalYear(new Date(ref.getFullYear() - 30 + i, 0, 1)));
+	  }
+	  calLib.map(function (x) {
+	    x.init();
+	    x.setArrays();
+
+	    // check for leap year
+	    if (x.year % 4 === 0 && x.year % 100 !== 0 || x.year % 400 === 0) {
 	      dayInMonthArray[1] = 29;
 	    } else {
 	      dayInMonthArray[1] = 28;
 	    }
-	  }
-	};
 
-	var populate = function initAndAssignFullCalendar() {
-	  // shorthands
-	  var mLayout = calInstance.month.monthCellLayout;
-	  var days = calInstance.month.days;
-	  var day = calInstance.month.day;
-	  var dayName = calInstance.dayName;
-
-	  // set the year dynamicly
-	  calInstance.refDate.setFullYear(calInstance.year + count);
-
-	  j = 0;
-
-	  // set up the arrays in the month (12 arrays of days/names/day)
-	  calInstance.month.name.map(function () {
-	    leapCheck(1);
-
-	    // setup the arrays
-	    calInstance.refDate.setMonth(j);
-	    calInstance.refDate.setDate(0);
-	    days[j].push([]);
-	    day[j].push([]);
-	    dayName[j].push([]);
-
-	    for (i = 0; i < dayInMonthArray[j]; i += 1) {
-	      // increment the reference day
-	      calInstance.refDate.setDate(i + 1);
-	      // set the date's digit of the current day
-	      days[j][i] = i + 1;
-	      // set the day of the week of the current day
-	      day[j][i] = calInstance.refDate.getDay();
-	      // set the label of the current day
-	      dayName[j][i] = weekArr[calInstance.refDate.getDay()];
-	    }
-
-	    var startingDate = day[j][0];
-
-	    var digit = 0;
-	    for (k = 0; k < 40; k += 1) {
-	      // check month for congruence
-	      switch (true) {
-	        // where k goes over the max # of days in the current month
-	        case k > dayInMonthArray[j] - startingDate:
-	          if (j === 11) {
-	            digit = days[0][k - dayInMonthArray[11] - (startingDate + 1)];
-	          } else {
-	            digit = days[j + 1][0];
-	            console.log(days[j + 1][1]);
-	          }
-	          break;
-	        // where the first day to display is from the previous month
-	        // case ((startingDate + 1) > k):
-	        //   if (j === 0) {
-	        //     digit = days[11][(dayInMonthArray[11] - (startingDate)) + k];
-	        //   } else {
-	        //     digit = days[j - 1][(dayInMonthArray[j - 1] - (startingDate)) + k];
-	        //   }
-	        //   break;
-	        default:
-	        //   digit = days[j][k - (startingDate)];
+	    for (j = 0; j < 12; j += 1) {
+	      x.date.setMonth(j);
+	      for (i = 0; i < dayInMonthArray[j]; i += 1) {
+	        // increment the reference day
+	        x.date.setDate(i + 1);
+	        // set the date's digit of the current day
+	        x.days[j].push(i + 1);
+	        // set the day of the week of the current day
+	        x.day[j].push(x.date.getDay());
+	        // set the label of the current day
+	        x.dayName[j].push(weekArr[x.date.getDay()]);
 	      }
-	      mLayout[j].push(digit);
 	    }
-
-	    j += 1;
-	    return calInstance;
+	    return calLib;
 	  });
-	};
+
+	  console.log(calLib[counter]);
+	}
 
 	var renderY = function renderTheFullYear(_ref) {
 	  var titleElemSup = _ref.titleElemSup;
 	  var contentElemSup = _ref.contentElemSup;
 
 	  // shorthands
-	  var mLayout = calInstance.month.monthCellLayout;
+	  var prevYear = calLib[count - 1];
+	  var curYear = calLib[count];
+	  var nextYear = calLib[count + 1];
+
+	  if (curYear.year % 4 === 0 && curYear.year % 100 !== 0 || curYear.year % 400 === 0) {
+	    dayInMonthArray[1] = 29;
+	  } else {
+	    dayInMonthArray[1] = 28;
+	  }
 
 	  // reset iterators
 	  j = 0;
 	  k = 0;
 
 	  // append the year to the title bar
-	  $(titleElemSup).append(calInstance.year);
+	  $(titleElemSup).append(curYear.year);
 
 	  // append the months
 	  monthArr.map(function (x) {
@@ -236,41 +187,32 @@
 	    });
 
 	    // append the date to the calendar
-	    mLayout[j].map(function (z) {
-	      $('.dayDigits').eq(j + 1).append('<div>' + z + '</div>');
-	      return mLayout[j];
-	    });
+	    for (i = 0; i < 42; i += 1) {
+	      var digit = 0;
+	      switch (true) {
+	        case i > dayInMonthArray[j] - 1 + curYear.day[j][0]:
+	          if (j === 11) {
+	            digit = nextYear.days[0][i - dayInMonthArray[0]] - curYear.day[j][0];
+	          } else {
+	            digit = curYear.days[j][i - dayInMonthArray[j]] - curYear.day[j][0];
+	          }
+	          break;
+	        case curYear.day[j][0] > i:
+	          if (j === 0) {
+	            digit = prevYear.days[11][dayInMonthArray[11] - (curYear.day[j][0] - i)];
+	          } else {
+	            digit = curYear.days[j - 1][dayInMonthArray[j - 1] - (curYear.day[j][0] - i)];
+	          }
+	          break;
+	        default:
+	          digit = i - curYear.day[j][0] + 1;
+	      }
+	      $('.dayDigits').eq(j + 1).append('<div>' + digit + '</div>');
+	    }
+
 	    j += 1;
 	    return monthArr;
 	  });
-	};
-
-	var build = function initiatAndRenderDocument(_ref2) {
-	  var title = _ref2.title;
-	  var content = _ref2.content;
-
-	  calStateInit();
-	  leapCheck();
-	  populate();
-	  renderY({ titleElemSup: title, contentElemSup: content });
-	};
-
-	var yearView = function initAndDisplayFullYear(_ref3) {
-	  var titleElemSup = _ref3.titleElemSup;
-	  var contentElemSup = _ref3.contentElemSup;
-
-	  // reset the dom
-	  clear(titleElemSup);
-	  clear(contentElemSup);
-	};
-
-	var monthView = function initAndDisplayMonth(_ref4) {
-	  var titleElemSup = _ref4.titleElemSup;
-	  var contentElemSup = _ref4.contentElemSup;
-
-	  // reset the dom
-	  clear(titleElemSup);
-	  clear(contentElemSup);
 	};
 
 	// counter management
@@ -280,28 +222,9 @@
 	var countDown = function setYearCounterDown() {
 	  count -= 1;
 	};
-	build({ title: '#macroContent', content: '#microContent' });
 
-	// trigger year mode on click
-	$('#yearButton').listen('click', function () {
-	  yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
-	});
-
-	// trigger month mode on click
-	$('#monthButton').listen('click', function () {
-	  monthView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
-	});
-
-	// cycle year/month on click
-	$('#prev').listen('click', function () {
-	  countDown();
-	});
-	$('#next').listen('click', function () {
-	  countUp();
-	});
-	// default view
-	// yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
-	console.log(calInstance);
+	dateFull(count);
+	renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
 
 /***/ }
 /******/ ]);
