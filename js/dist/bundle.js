@@ -149,9 +149,9 @@
 	        // set the day of the week of the current day
 	        x.day[j].push((x.date.getDay() + 6) % 7);
 	        // set the label of the current day
-	        x.dayName[j].push(weekArr[x.date.getDay()]);
+	        x.dayName[j].push(weekArr[(x.date.getDay() + 6) % 7]);
 
-	        x.dateFull[j].push('year: ' + x.date.getFullYear() + ' month: ' + x.date.getMonth() + ' day: ' + x.date.getDay());
+	        x.dateFull[j].push('year: ' + x.date.getFullYear() + ' month: ' + x.date.getMonth() + ' day: ' + (x.date.getDay() + 6) % 7);
 	      }
 	    }
 	    l += 1;
