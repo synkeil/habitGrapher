@@ -1,1 +1,1 @@
-document.write('working');
+console.log('"t"works');

@@ -1,10 +1,10 @@
 module.exports = {
   entry: {
-    'source': __dirname+'/js/src/app.js',
+    'bundle': __dirname+'/js/src/calendar.js',
   },
   output:{
     path: __dirname+'/js/dist/',
-    filename: 'bundle.js'
+    filename: '[name].js'
   }
   ,
   module: {

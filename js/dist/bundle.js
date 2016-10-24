@@ -42,24 +42,6 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	__webpack_require__(1);
-
-	__webpack_require__(2);
-
-/***/ },
-/* 1 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	document.write('working');
-
-/***/ },
-/* 2 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -67,41 +49,6 @@
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var CalState = function () {
-	  function CalState(label) {
-	    _classCallCheck(this, CalState);
-
-	    this.date = new Date();
-	    this.year = this.date.getFullYear();
-	    this.month = {
-	      name: label,
-	      number: this.date.getMonth(),
-	      days: [],
-	      day: []
-	    };
-	    this.dayName = [];
-	  }
-
-	  _createClass(CalState, [{
-	    key: 'init',
-	    value: function init() {
-	      this.year = this.date.getFullYear();
-	      this.month.number = this.date.getMonth();
-	    }
-	  }, {
-	    key: 'setArrays',
-	    value: function setArrays() {
-	      for (var m = 0; m < 12; m += 1) {
-	        this.month.days.push([]);
-	        this.month.day.push([]);
-	        this.dayName.push([]);
-	      }
-	    }
-	  }]);
-
-	  return CalState;
-	}();
 
 	var monthArr = ['Janvier', 'Fevrier', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 	var dayInMonthArray = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -122,15 +69,7 @@
 	var j = 0;
 	var k = 0;
 	var l = 0;
-
-	// the calendar object instence recipient
-	var calArray = {};
-
-	// create a new calendar object
-	var calStateInit = function populateCurrentYearState() {
-	  calArray = new CalState(monthArr);
-	  calArray.setArrays();
-	};
+	var count = 30;
 
 	// initiating the hours array
 	for (i = 0; i < 24; i += 1) {
@@ -145,184 +84,159 @@
 	  elMac = newBoxMac;
 	};
 
-	// Check for leap year and adjust feb days
-	var leapCheck = function checkForLeapYear(check) {
-	  if (check === 1) {
-	    if (calArray.year % 4 === 0 && calArray.year % 100 !== 0 || calArray.year % 400 === 0) {
-	      dayInMonthArray[1] = 29;
-	    }
+	var calLib = [];
+
+	var ref = new Date();
+
+	var CalYear = function () {
+	  function CalYear(dateSet) {
+	    _classCallCheck(this, CalYear);
+
+	    this.date = dateSet;
+	    this.year = ref.getFullYear();
+	    this.days = [];
+	    this.day = [];
+	    this.dayName = [];
+	    this.dateFull = [];
 	  }
-	};
 
-	// function to set the calendar in year view
-	var yearInit = function initInYearView() {
-	  // check for leap year
-	  calStateInit();
-	  leapCheck(1);
-
-	  var refDate = new Date(calArray.year, 0, 1);
-	  // reset iterators
-	  j = 0;
-	  k = 0;
-
-	  // iterate over each elem of the array
-	  monthArr.map(function () {
-	    // set date to current month
-	    refDate.setMonth(j);
-	    refDate.setDate(1);
-	    calArray.date.setDate(1);
-	    calArray.init();
-	    refDate.setFullYear(calArray.year);
-
-	    // set the number of the first monday
-	    var prevMonthLen = dayInMonthArray[(j + 11) % 12];
-	    var currentMonthLen = dayInMonthArray[(j + 12) % 12];
-	    var sundayToMonday = cycle(calArray.date.getDay() + 7, 7) - 1;
-	    var prevMonthDif = prevMonthLen + sundayToMonday;
-	    var curMonthDif = currentMonthLen + sundayToMonday;
-	    var strartingDigit = prevMonthDif > prevMonthLen - 1 ? prevMonthLen - (sundayToMonday - 1) : curMonthDif;
-	    var digit = 1;
-
-	    // cycle the days digits
-	    for (k = 0; k < 42; k += 1) {
-	      // refDate.setFullYear(calArray.year);
-	      // refDate.setMonth(j);
-	      // starts prev month
-	      if (k <= sundayToMonday) {
-	        if (j === 0) {
-	          // refDate.setFullYear((refDate.getFullYear() - 1));
-	        }
-	        digit = strartingDigit + k;
-	        // refDate.setMonth(cycle((j + 11), 11));
-	        // refDate.setDate(digit);
-	        calArray.init();
-	      } else {
-	        // is current month
-	        digit = cycle(k - (prevMonthLen - strartingDigit), currentMonthLen);
-	        // refDate.setMonth(j);
-	        // refDate.setDate(digit);
-	        calArray.init();
-	      }
-	      if (strartingDigit === 0) {
-	        // is next month
-	        if (k > dayInMonthArray[calArray.month.number]) {
-	          if (j === 11) {}
-	          // refDate.setFullYear((refDate.getFullYear() + 1));
-
-	          // refDate.setMonth(cycle((j + 1), 11));
-	          // refDate.setDate(digit);
-	          calArray.init();
-	        }
-	        digit = cycle(k, currentMonthLen);
-	      }
-
-	      // populate the current month's days array with the appropriate series of numbers
-	      calArray.month.days[j].push(digit);
-	      calArray.month.day[j].push(calArray.date.getDay());
-	      calArray.dayName[j].push(dayInMonthArray[calArray.month.day]);
-
-	      // set date to current day
-	      calArray.init();
+	  _createClass(CalYear, [{
+	    key: 'init',
+	    value: function init() {
+	      this.year = this.date.getFullYear();
 	    }
-	    console.log('after : ' + refDate);
-	    j += 1;
-	    return monthArr;
+	  }, {
+	    key: 'setArrays',
+	    value: function setArrays() {
+	      for (var m = 0; m < 12; m += 1) {
+	        this.days.push([]);
+	        this.day.push([]);
+	        this.dayName.push([]);
+	        this.dateFull.push([]);
+	      }
+	    }
+	  }]);
+
+	  return CalYear;
+	}();
+
+	function dateFull(counter) {
+	  for (i = 0; i < 60; i += 1) {
+	    // populate the array with objects at date -/+ 30
+	    calLib.push(new CalYear(new Date(ref.getFullYear() - 30 + i, 0, 1)));
+	  }
+	  l = 0;
+	  calLib.map(function (x) {
+	    x.init();
+	    x.setArrays();
+
+	    x.date = new Date(ref.getFullYear() - 30 + l, 0, 1);
+
+	    // check for leap year
+	    if (x.year % 4 === 0 && x.year % 100 !== 0 || x.year % 400 === 0) {
+	      dayInMonthArray[1] = 29;
+	    } else {
+	      dayInMonthArray[1] = 28;
+	    }
+
+	    for (j = 0; j < 12; j += 1) {
+	      x.date = new Date(ref.getFullYear() - 30 + l, j, 1);
+	      for (i = 0; i < dayInMonthArray[j]; i += 1) {
+	        // increment the reference day
+	        x.date = new Date(ref.getFullYear() - 30 + l, j, i + 1);
+	        // set the date's digit of the current day
+	        x.days[j].push(i + 1);
+	        // set the day of the week of the current day
+	        x.day[j].push(x.date.getDay() - 1);
+	        // set the label of the current day
+	        x.dayName[j].push(weekArr[x.date.getDay()]);
+	        x.dateFull[j].push('year: ' + x.date.getFullYear() + ' month: ' + x.date.getMonth() + ' day: ' + x.date.getDay());
+	      }
+	    }
+	    l += 1;
+	    return calLib;
 	  });
-	};
 
-	var renderYear = function renderTheYearView(_ref) {
-	  var titleElem = _ref.titleElem;
-	  var contentElem = _ref.contentElem;
+	  console.log(calLib[counter]);
+	}
 
-	  console.log(calArray);
+	var renderY = function renderTheFullYear(_ref) {
+	  var titleElemSup = _ref.titleElemSup;
+	  var contentElemSup = _ref.contentElemSup;
+
+	  // shorthands
+	  var prevYear = calLib[count - 1];
+	  var curYear = calLib[count];
+	  var nextYear = calLib[count + 1];
+
+	  if (curYear.year % 4 === 0 && curYear.year % 100 !== 0 || curYear.year % 400 === 0) {
+	    dayInMonthArray[1] = 29;
+	  } else {
+	    dayInMonthArray[1] = 28;
+	  }
+
 	  // reset iterators
 	  j = 0;
 	  k = 0;
 
-	  // clear the dom
-	  clear(iQ(titleElem).dom());
-	  clear(iQ(contentElem).dom());
+	  // append the year to the title bar
+	  $(titleElemSup).append(curYear.year);
 
-	  // append the scope (year/month/week/day)
-	  iQ(titleElem).append(calArray.year);
+	  // append the months
+	  monthArr.map(function (x) {
+	    // append the months name and prepare the dom for the rest
+	    $(contentElemSup).append('<div class="monthCell"><p>' + x + '</p><div class="dayLabels"></div><div class="dayDigits"></div></div>');
 
-	  // iterate over each exlem of the array
-	  calArray.month.name.map(function (x) {
-	    // appending month cells/ days prep
-	    iQ(contentElem).append('<div class="monthCell"><p>' + x + '</p><div class="dayLabels"></div><div class="dayDigits"></div></div>');
-
-	    // append the weekdays shorthand
+	    // append the day shorthand to the calendar
 	    weekArrSrt.map(function (y) {
-	      iQ('.dayLabels').eq(j + 1).append('<div>' + y + '</div>');
+	      $('.dayLabels').eq(j + 1).append('<div>' + y + '</div>');
 	      return weekArrSrt;
 	    });
 
-	    // cycle the days digits
-	    calArray.month.days[j].map(function (y) {
-	      iQ('.dayDigits').eq(j + 1).append('<div>' + y + '</div>');
-	      return calArray.month.days;
-	    });
+	    // append the date to the calendar
+	    for (i = 0; i < 42; i += 1) {
+	      var digit = 0;
+	      switch (true) {
+	        // day overflow
+	        case i > dayInMonthArray[j] - 1 + curYear.day[j][0]:
+	          if (j === 11) {
+	            digit = nextYear.days[0][i - dayInMonthArray[0]] - curYear.day[j][0];
+	          } else {
+	            digit = curYear.days[j][i - dayInMonthArray[j]] - curYear.day[j][0];
+	          }
+	          break;
+	        // not on monday
+	        case curYear.day[j][0] > i:
+	          if (j === 0) {
+	            digit = prevYear.days[11][dayInMonthArray[11] - (curYear.day[j][0] - i)];
+	          } else {
+	            digit = curYear.days[j - 1][dayInMonthArray[j - 1] - (curYear.day[j][0] - i)];
+	          }
+	          break;
+	        default:
+	          digit = i - curYear.day[j][0] + 1;
+	      }
+	      $('.dayDigits').eq(j + 1).append('<div>' + digit + '</div>');
+	    }
 
 	    j += 1;
 	    return monthArr;
 	  });
 	};
 
-	var renderMonth = function renderTheMonthView(_ref2) {
-	  var titleElem = _ref2.titleElem;
-	  var contentElem = _ref2.contentElem;
-
-	  console.log(calArray);
-	  // reset iterators
-	  j = 0;
-	  k = 0;
-
-	  // clear the dom
-	  clear(iQ(titleElem).dom());
-	  clear(iQ(contentElem).dom());
-
-	  // append the scope (year/month/week/day)
-	  iQ(titleElem).append(calArray.month.name[calArray.month.number]);
-
-	  // iterate over each exlem of the array
-	  calArray.dayName.map(function (x) {
-	    // appending day cells/ days prep
-	    iQ(contentElem).append('<div class="dayCell"><p>' + x + '</p><div class="daydigit">' + calArray.month.day[j] + '</div></div>');
-
-	    j += 1;
-	    return monthArr;
-	  });
+	// counter management
+	var countUp = function setYearCounterUp() {
+	  count += 1;
+	};
+	var countDown = function setYearCounterDown() {
+	  count -= 1;
 	};
 
-	var yearView = function initAndRenderYear(_ref3) {
-	  var contentElemSup = _ref3.contentElemSup;
-	  var titleElemSup = _ref3.titleElemSup;
+	dateFull(count);
+	renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
 
-	  yearInit();
-	  renderYear({
-	    contentElem: contentElemSup, titleElem: titleElemSup
-	  });
-	};
-
-	var monthView = function initAndRenderMonth(_ref4) {
-	  var contentElemSup = _ref4.contentElemSup;
-	  var titleElemSup = _ref4.titleElemSup;
-
-	  yearInit();
-	  renderMonth({
-	    contentElem: contentElemSup, titleElem: titleElemSup
-	  });
-	};
-	// trigger year mode on click
-	iQ('#yearButton').listen('click', function () {
-	  yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
-	});
-	iQ('#monthButton').listen('click', function () {
-	  monthView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
-	});
-
-	// default view
-	yearView({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+	var test = new Date(2016, 1, 1);
+	console.log(test);
 
 /***/ }
 /******/ ]);
