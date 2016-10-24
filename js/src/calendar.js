@@ -16,7 +16,7 @@ const cycle = (elem, range) => {
 let i = 0;
 let j = 0;
 let k = 0;
-// let l = 0;
+let l = 0;
 let count = 30;
 
 // initiating the hours array
@@ -43,6 +43,7 @@ class CalYear {
     this.days = [];
     this.day = [];
     this.dayName = [];
+    this.dateFull = [];
   }
   init() {
     this.year = this.date.getFullYear();
@@ -52,6 +53,7 @@ class CalYear {
       this.days.push([]);
       this.day.push([]);
       this.dayName.push([]);
+      this.dateFull.push([]);
     }
   }
 }
@@ -63,10 +65,13 @@ function dateFull(counter) {
       new CalYear(new Date(((ref.getFullYear() - 30) + i), 0, 1))
     );
   }
+  l = 0;
   calLib.map(
     (x) => {
       x.init();
       x.setArrays();
+
+      x.date = new Date(((ref.getFullYear() - 30) + l), 0, 1);
 
       // check for leap year
       if (
@@ -78,18 +83,20 @@ function dateFull(counter) {
       }
 
       for (j = 0; j < 12; j += 1) {
-        x.date.setMonth(j);
+        x.date = new Date(((ref.getFullYear() - 30) + l), j, 1);
         for (i = 0; i < dayInMonthArray[j]; i += 1) {
           // increment the reference day
-          x.date.setDate(i + 1);
+          x.date = new Date(((ref.getFullYear() - 30) + l), j, i + 1);
           // set the date's digit of the current day
           x.days[j].push(i + 1);
           // set the day of the week of the current day
-          x.day[j].push(x.date.getDay());
+          x.day[j].push((x.date.getDay() - 1));
           // set the label of the current day
           x.dayName[j].push(weekArr[x.date.getDay()]);
+          x.dateFull[j].push(`year: ${x.date.getFullYear()} month: ${x.date.getMonth()} day: ${x.date.getDay()}`);
         }
       }
+      l += 1;
       return calLib;
     }
   );
@@ -136,6 +143,7 @@ const renderY = function renderTheFullYear({ titleElemSup, contentElemSup }) {
       for (i = 0; i < 42; i += 1) {
         let digit = 0;
         switch (true) {
+          // day overflow
           case (i > ((dayInMonthArray[j] - 1) + curYear.day[j][0])):
             if (j === 11) {
               digit = nextYear.days[0][i - dayInMonthArray[0]] - curYear.day[j][0];
@@ -143,6 +151,7 @@ const renderY = function renderTheFullYear({ titleElemSup, contentElemSup }) {
               digit = curYear.days[j][i - dayInMonthArray[j]] - curYear.day[j][0];
             }
             break;
+          // not on monday
           case (curYear.day[j][0] > i):
             if (j === 0) {
               digit = prevYear.days[11][dayInMonthArray[11] - (curYear.day[j][0] - i)];
@@ -173,3 +182,6 @@ const countDown = function setYearCounterDown() {
 
 dateFull(count);
 renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+
+const test = new Date(2016, 1, 1);
+console.log(test);

@@ -68,7 +68,7 @@
 	var i = 0;
 	var j = 0;
 	var k = 0;
-	// let l = 0;
+	var l = 0;
 	var count = 30;
 
 	// initiating the hours array
@@ -97,6 +97,7 @@
 	    this.days = [];
 	    this.day = [];
 	    this.dayName = [];
+	    this.dateFull = [];
 	  }
 
 	  _createClass(CalYear, [{
@@ -111,6 +112,7 @@
 	        this.days.push([]);
 	        this.day.push([]);
 	        this.dayName.push([]);
+	        this.dateFull.push([]);
 	      }
 	    }
 	  }]);
@@ -123,9 +125,12 @@
 	    // populate the array with objects at date -/+ 30
 	    calLib.push(new CalYear(new Date(ref.getFullYear() - 30 + i, 0, 1)));
 	  }
+	  l = 0;
 	  calLib.map(function (x) {
 	    x.init();
 	    x.setArrays();
+
+	    x.date = new Date(ref.getFullYear() - 30 + l, 0, 1);
 
 	    // check for leap year
 	    if (x.year % 4 === 0 && x.year % 100 !== 0 || x.year % 400 === 0) {
@@ -135,18 +140,20 @@
 	    }
 
 	    for (j = 0; j < 12; j += 1) {
-	      x.date.setMonth(j);
+	      x.date = new Date(ref.getFullYear() - 30 + l, j, 1);
 	      for (i = 0; i < dayInMonthArray[j]; i += 1) {
 	        // increment the reference day
-	        x.date.setDate(i + 1);
+	        x.date = new Date(ref.getFullYear() - 30 + l, j, i + 1);
 	        // set the date's digit of the current day
 	        x.days[j].push(i + 1);
 	        // set the day of the week of the current day
-	        x.day[j].push(x.date.getDay());
+	        x.day[j].push(x.date.getDay() - 1);
 	        // set the label of the current day
 	        x.dayName[j].push(weekArr[x.date.getDay()]);
+	        x.dateFull[j].push('year: ' + x.date.getFullYear() + ' month: ' + x.date.getMonth() + ' day: ' + x.date.getDay());
 	      }
 	    }
+	    l += 1;
 	    return calLib;
 	  });
 
@@ -190,6 +197,7 @@
 	    for (i = 0; i < 42; i += 1) {
 	      var digit = 0;
 	      switch (true) {
+	        // day overflow
 	        case i > dayInMonthArray[j] - 1 + curYear.day[j][0]:
 	          if (j === 11) {
 	            digit = nextYear.days[0][i - dayInMonthArray[0]] - curYear.day[j][0];
@@ -197,6 +205,7 @@
 	            digit = curYear.days[j][i - dayInMonthArray[j]] - curYear.day[j][0];
 	          }
 	          break;
+	        // not on monday
 	        case curYear.day[j][0] > i:
 	          if (j === 0) {
 	            digit = prevYear.days[11][dayInMonthArray[11] - (curYear.day[j][0] - i)];
@@ -225,6 +234,9 @@
 
 	dateFull(count);
 	renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+
+	var test = new Date(2016, 1, 1);
+	console.log(test);
 
 /***/ }
 /******/ ]);
