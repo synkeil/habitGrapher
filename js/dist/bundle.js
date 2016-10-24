@@ -84,6 +84,9 @@
 	var ref = new Date();
 	// month counter
 	var mCount = ref.getMonth();
+	var fCount = ref.getFullYear();
+	var wCount = ref.getDate() % 7;
+	var dCount = ref.getDate();
 
 	var CalYear = function () {
 	  function CalYear(dateSet) {

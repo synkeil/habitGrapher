@@ -32,6 +32,9 @@ const calLib = [];
 const ref = new Date();
 // month counter
 let mCount = ref.getMonth();
+let fCount = ref.getFullYear();
+let wCount = ref.getDate() % 7;
+let dCount = ref.getDate();
 
 
 class CalYear {
