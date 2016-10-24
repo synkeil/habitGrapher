@@ -55,13 +55,16 @@
 	var weekArr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 	var weekArrSrt = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 	var hoursArr = [];
+	var mode = 0;
 
 	// iteration variables;
 	var i = 0;
 	var j = 0;
 	// let k = 0;
 	var l = 0;
-	var count = 30;
+
+	// year counter
+	var count = 0;
 
 	// initiating the hours array
 	for (i = 0; i < 24; i += 1) {
@@ -79,6 +82,8 @@
 	var calLib = [];
 
 	var ref = new Date();
+	// month counter
+	var mCount = ref.getMonth();
 
 	var CalYear = function () {
 	  function CalYear(dateSet) {
@@ -143,8 +148,6 @@
 	        x.day[j].push((x.date.getDay() + 6) % 7);
 	        // set the label of the current day
 	        x.dayName[j].push(weekArr[(x.date.getDay() + 6) % 7]);
-
-	        x.dateFull[j].push('year: ' + x.date.getFullYear() + ' month: ' + x.date.getMonth() + ' day: ' + (x.date.getDay() + 6) % 7);
 	      }
 	    }
 	    l += 1;
@@ -152,7 +155,7 @@
 	  });
 	}
 
-	var renderY = function renderTheFullYear(_ref) {
+	var renderYear = function renderTheFullYear(_ref) {
 	  var titleElemSup = _ref.titleElemSup;
 	  var contentElemSup = _ref.contentElemSup;
 
@@ -161,6 +164,7 @@
 	  var curYear = calLib[count];
 	  var nextYear = calLib[count + 1];
 
+	  // check for leap year
 	  if (curYear.year % 4 === 0 && curYear.year % 100 !== 0 || curYear.year % 400 === 0) {
 	    dayInMonthArray[1] = 29;
 	  } else {
@@ -215,36 +219,135 @@
 	  });
 	};
 
+	var renderFancy = function renderCalAndDetails() {};
+	var renderMonth = function renderMonthDetailedView(_ref2) {
+	  var first = _ref2.titleElemSup;
+	  var second = _ref2.contentElemSup;
+
+	  var curYear = calLib[count];
+
+	  // render month title
+	  $(first).append(monthArr[mCount]);
+
+	  i = 1;
+	  // append global blueprint
+	  curYear.dayName[mCount].map(function (x) {
+	    $(second).append('<div class="mvDayCell"><p class="mvDlabel">' + x + '</p><p class="mvDdigit">' + i + '</p></div>');
+	    i += 1;
+	    return curYear.dayName[mCount];
+	  });
+	  console.log(curYear);
+	};
+	var renderWeek = function renderWeekDetailedView() {};
+	var renderDay = function renderDayDetailedView() {};
+
 	// counter management
 	var countUp = function setYearCounterUp() {
-	  count += 1;
+	  // check view mode selected
+	  switch (mode) {
+	    case 0:
+	      count += 1;
+	      break;
+	    case 1:
+	      fCount += 1;
+	      break;
+	    case 2:
+	      if (mCount === 11) {
+	        count += 1;
+	        mCount = 0;
+	      } else {
+	        mCount += 1;
+	      }
+	      break;
+	    case 3:
+	      wCount += 1;
+	      break;
+	    default:
+	      dCount += 1;
+	  }
 	};
 	var countDown = function setYearCounterDown() {
-	  count -= 1;
+	  // check view mode selected
+	  switch (mode) {
+	    case 0:
+	      count -= 1;
+	      break;
+	    case 1:
+	      fCount -= 1;
+	      break;
+	    case 2:
+	      if (mCount === 0) {
+	        count -= 1;
+	        mCount = 11;
+	      } else {
+	        mCount -= 1;
+	      }
+	      break;
+	    case 3:
+	      wCount -= 1;
+	      break;
+	    default:
+	      dCount -= 1;
+	  }
+	};
+
+	var build = function initTheCalAndRender(first, second) {
+	  clear($(first).dom());
+	  clear($(second).dom());
+
+	  // check view mode selected
+	  switch (mode) {
+	    case 0:
+	      renderYear({ titleElemSup: first, contentElemSup: second });
+	      break;
+	    case 1:
+	      renderFancy({ titleElemSup: first, contentElemSup: second });
+	      break;
+	    case 2:
+	      renderMonth({ titleElemSup: first, contentElemSup: second });
+	      break;
+	    case 3:
+	      renderWeek({ titleElemSup: first, contentElemSup: second });
+	      break;
+	    default:
+	      renderDay({ titleElemSup: first, contentElemSup: second });
+	  }
 	};
 
 	var initBase = function setUpBaseView() {
-	  calInit(200);
-	  renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+	  calInit(80);
+	  build('#macroContent', '#microContent');
 	};
 
-	initBase();
+	$('#fancyButton').listen('click', function () {
+	  mode = 1;build('#macroContent', '#microContent');
+	});
+	$('#yearButton').listen('click', function () {
+	  mode = 0;build('#macroContent', '#microContent');
+	});
+	$('#monthButton').listen('click', function () {
+	  mode = 2;build('#macroContent', '#microContent');
+	});
+	$('#weekButton').listen('click', function () {
+	  mode = 3;build('#macroContent', '#microContent');
+	});
+	$('#dayButton').listen('click', function () {
+	  mode = 4;build('#macroContent', '#microContent');
+	});
 
 	$('#next').listen('click', function () {
 	  countUp();
-	  clear($('#macroContent').dom());
-	  clear($('#microContent').dom());
-	  renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+	  build('#macroContent', '#microContent');
 	});
 	$('#prev').listen('click', function () {
 	  countDown();
-	  clear($('#macroContent').dom());
-	  clear($('#microContent').dom());
-	  renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+	  build('#macroContent', '#microContent');
 	});
 
-	var test = new Date(2016, 1, 1);
-	console.log(test);
+	initBase();
+
+	// const test = new Date(2016, 1, 1);
+	// console.log(test);
 
 /***/ }
 /******/ ]);

@@ -8,13 +8,13 @@ body,div,section,article,main,nav,header,footer{/* browser specific reset */
 /* Globals/flex setup */
 .contain{
   width:100%;
-  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
 .cover{
   width:100%;
-  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
@@ -23,7 +23,6 @@ body{
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  min-height: 100vh;
 }
 
 footer,header{
@@ -59,7 +58,8 @@ footer,header{
 
 /* calendar global layout */
 #calendarProper{
-  width:100vw;height: calc(100vh - 20px);
+  width:100vw;height:100vh;
+  min-height: 100px;
   background-color: #EEE;
   color:#777
 }
@@ -124,4 +124,48 @@ footer,header{
 }
 .dayDigits div:nth-child(7n+7),.dayDigits div:nth-child(7n+6){
   color: #ccc;
+}
+
+
+/*****************
+Month view styling
+*****************/
+
+/*day main cell*/
+.mvDayCell{
+  width: 13.9%;
+  height: 20%;
+  border-bottom: 1px solid lightgrey;
+  border-right: 1px solid lightgrey;
+}
+
+.mvDlabel{
+  height:20%;
+  width: 100%;
+  margin-left: 5px;
+  font-size: 1.2em;
+  color: #f55
+}
+.mvDdigit{
+  text-align: center;
+  height:79%;
+  width: 100%;
+  font-size: 1em;
+}
+
+@media (max-width: 525px) {
+  .mvDlabel{
+    font-size: .8em;
+  }
+  .mvDdigit{
+    font-size: .9em;
+  }
+}
+@media (max-width: 420px) {
+  .mvDlabel{
+    font-size: .6em;
+  }
+  .mvDdigit{
+    font-size: .8em;
+  }
 }
