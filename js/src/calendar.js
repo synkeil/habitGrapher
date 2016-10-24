@@ -3,13 +3,16 @@ const dayInMonthArray = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const weekArr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 const weekArrSrt = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 const hoursArr = [];
+let mode = 0;
 
 // iteration variables;
 let i = 0;
 let j = 0;
 // let k = 0;
 let l = 0;
-let count = 30;
+
+// year counter
+let count = 0;
 
 // initiating the hours array
 for (i = 0; i < 24; i += 1) {
@@ -27,6 +30,9 @@ const clear = function clearTheDom(elemToClear) {
 const calLib = [];
 
 const ref = new Date();
+// month counter
+let mCount = ref.getMonth();
+
 
 class CalYear {
   constructor(dateSet) {
@@ -86,8 +92,6 @@ function calInit(span) {
           x.day[j].push((x.date.getDay() + 6) % 7);
           // set the label of the current day
           x.dayName[j].push(weekArr[(x.date.getDay() + 6) % 7]);
-
-          x.dateFull[j].push(`year: ${x.date.getFullYear()} month: ${x.date.getMonth()} day: ${(x.date.getDay() + 6) % 7}`);
         }
       }
       l += 1;
@@ -96,12 +100,13 @@ function calInit(span) {
   );
 }
 
-const renderY = function renderTheFullYear({ titleElemSup, contentElemSup }) {
+const renderYear = function renderTheFullYear({ titleElemSup, contentElemSup }) {
   // shorthands
   const prevYear = calLib[count - 1];
   const curYear = calLib[count];
   const nextYear = calLib[count + 1];
 
+  // check for leap year
   if (
     (curYear.year % 4 === 0 && curYear.year % 100 !== 0) ||
     curYear.year % 400 === 0) {
@@ -162,35 +167,136 @@ const renderY = function renderTheFullYear({ titleElemSup, contentElemSup }) {
   );
 };
 
+const renderFancy = function renderCalAndDetails() {};
+const renderMonth = function renderMonthDetailedView({
+  titleElemSup: first,
+  contentElemSup: second,
+}) {
+  const curYear = calLib[count];
+
+  // render month title
+  $(first).append(monthArr[mCount]);
+
+  i = 1;
+  // append global blueprint
+  curYear.dayName[mCount].map(
+    (x) => {
+      $(second).append(
+        `<div class="mvDayCell"><p class="mvDlabel">${x}</p><p class="mvDdigit">${i}</p></div>`
+      );
+      i += 1;
+      return curYear.dayName[mCount];
+    }
+  );
+  console.log(curYear);
+};
+const renderWeek = function renderWeekDetailedView() {};
+const renderDay = function renderDayDetailedView() {};
 
 // counter management
 const countUp = function setYearCounterUp() {
-  count += 1;
+  // check view mode selected
+  switch (mode) {
+    case (0):
+      count += 1;
+      break;
+    case (1):
+      fCount += 1;
+      break;
+    case (2):
+      if (mCount === 11) {
+        count += 1;
+        mCount = 0;
+      } else {
+        mCount += 1;
+      }
+      break;
+    case (3):
+      wCount += 1;
+      break;
+    default:
+      dCount += 1;
+  }
 };
 const countDown = function setYearCounterDown() {
-  count -= 1;
+  // check view mode selected
+  switch (mode) {
+    case (0):
+      count -= 1;
+      break;
+    case (1):
+      fCount -= 1;
+      break;
+    case (2):
+      if (mCount === 0) {
+        count -= 1;
+        mCount = 11;
+      } else {
+        mCount -= 1;
+      }
+      break;
+    case (3):
+      wCount -= 1;
+      break;
+    default:
+      dCount -= 1;
+  }
+};
+
+const build = function initTheCalAndRender(first, second) {
+  clear($(first).dom());
+  clear($(second).dom());
+
+  // check view mode selected
+  switch (mode) {
+    case (0):
+      renderYear({ titleElemSup: first, contentElemSup: second });
+      break;
+    case (1):
+      renderFancy({ titleElemSup: first, contentElemSup: second });
+      break;
+    case (2):
+      renderMonth({ titleElemSup: first, contentElemSup: second });
+      break;
+    case (3):
+      renderWeek({ titleElemSup: first, contentElemSup: second });
+      break;
+    default:
+      renderDay({ titleElemSup: first, contentElemSup: second });
+  }
 };
 
 const initBase = function setUpBaseView() {
-  calInit(200);
-  renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+  calInit(80);
+  build('#macroContent', '#microContent');
 };
 
-initBase();
+$('#fancyButton').listen('click', () => {
+  mode = 1; build('#macroContent', '#microContent');
+});
+$('#yearButton').listen('click', () => {
+  mode = 0; build('#macroContent', '#microContent');
+});
+$('#monthButton').listen('click', () => {
+  mode = 2; build('#macroContent', '#microContent');
+});
+$('#weekButton').listen('click', () => {
+  mode = 3; build('#macroContent', '#microContent');
+});
+$('#dayButton').listen('click', () => {
+  mode = 4; build('#macroContent', '#microContent');
+});
 
 $('#next').listen('click', () => {
   countUp();
-  clear($('#macroContent').dom());
-  clear($('#microContent').dom());
-  renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+  build('#macroContent', '#microContent');
 });
 $('#prev').listen('click', () => {
   countDown();
-  clear($('#macroContent').dom());
-  clear($('#microContent').dom());
-  renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+  build('#macroContent', '#microContent');
 });
 
+initBase();
 
-const test = new Date(2016, 1, 1);
-console.log(test);
+// const test = new Date(2016, 1, 1);
+// console.log(test);
