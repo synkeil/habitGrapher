@@ -56,14 +56,6 @@
 	var weekArrSrt = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 	var hoursArr = [];
 
-	// cycle elements wen out of range
-	var cycle = function cycle(elem, range) {
-	  if (elem > range) {
-	    return elem % range;
-	  }
-	  return elem;
-	};
-
 	// iteration variables;
 	var i = 0;
 	var j = 0;
@@ -120,17 +112,18 @@
 	  return CalYear;
 	}();
 
-	function dateFull(counter) {
-	  for (i = 0; i < 60; i += 1) {
-	    // populate the array with objects at date -/+ 30
-	    calLib.push(new CalYear(new Date(ref.getFullYear() - 30 + i, 0, 1)));
+	function calInit(span) {
+	  count = span / 2;
+	  for (i = 0; i < span; i += 1) {
+	    // populate the array with objects at date -/+ (span / 2)
+	    calLib.push(new CalYear(new Date(ref.getFullYear() - span / 2 + i, 0, 1)));
 	  }
 	  l = 0;
 	  calLib.map(function (x) {
 	    x.init();
 	    x.setArrays();
 
-	    x.date = new Date(ref.getFullYear() - 30 + l, 0, 1);
+	    x.date = new Date(ref.getFullYear() - span / 2 + l, 0, 1);
 
 	    // check for leap year
 	    if (x.year % 4 === 0 && x.year % 100 !== 0 || x.year % 400 === 0) {
@@ -140,10 +133,10 @@
 	    }
 
 	    for (j = 0; j < 12; j += 1) {
-	      x.date = new Date(ref.getFullYear() - 30 + l, j, 1);
+	      x.date = new Date(ref.getFullYear() - span / 2 + l, j, 1);
 	      for (i = 0; i < dayInMonthArray[j]; i += 1) {
 	        // increment the reference day
-	        x.date = new Date(ref.getFullYear() - 30 + l, j, i + 1);
+	        x.date = new Date(ref.getFullYear() - span / 2 + l, j, i + 1);
 	        // set the date's digit of the current day
 	        x.days[j].push(i + 1);
 	        // set the day of the week of the current day
@@ -157,8 +150,6 @@
 	    l += 1;
 	    return calLib;
 	  });
-
-	  console.log(calLib[counter]);
 	}
 
 	var renderY = function renderTheFullYear(_ref) {
@@ -232,8 +223,25 @@
 	  count -= 1;
 	};
 
-	dateFull(count);
-	renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+	var initBase = function setUpBaseView() {
+	  calInit(200);
+	  renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+	};
+
+	initBase();
+
+	$('#next').listen('click', function () {
+	  countUp();
+	  clear($('#macroContent').dom());
+	  clear($('#microContent').dom());
+	  renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+	});
+	$('#prev').listen('click', function () {
+	  countDown();
+	  clear($('#macroContent').dom());
+	  clear($('#microContent').dom());
+	  renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+	});
 
 	var test = new Date(2016, 1, 1);
 	console.log(test);
