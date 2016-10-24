@@ -4,14 +4,6 @@ const weekArr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'D
 const weekArrSrt = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 const hoursArr = [];
 
-// cycle elements wen out of range
-const cycle = (elem, range) => {
-  if (elem > range) {
-    return (elem % range);
-  }
-  return elem;
-};
-
 // iteration variables;
 let i = 0;
 let j = 0;
@@ -58,11 +50,12 @@ class CalYear {
   }
 }
 
-function dateFull(counter) {
-  for (i = 0; i < 60; i += 1) {
-    // populate the array with objects at date -/+ 30
+function calInit(span) {
+  count = (span / 2);
+  for (i = 0; i < span; i += 1) {
+    // populate the array with objects at date -/+ (span / 2)
     calLib.push(
-      new CalYear(new Date(((ref.getFullYear() - 30) + i), 0, 1))
+      new CalYear(new Date(((ref.getFullYear() - (span / 2)) + i), 0, 1))
     );
   }
   l = 0;
@@ -71,7 +64,7 @@ function dateFull(counter) {
       x.init();
       x.setArrays();
 
-      x.date = new Date(((ref.getFullYear() - 30) + l), 0, 1);
+      x.date = new Date(((ref.getFullYear() - (span / 2)) + l), 0, 1);
 
       // check for leap year
       if (
@@ -83,10 +76,10 @@ function dateFull(counter) {
       }
 
       for (j = 0; j < 12; j += 1) {
-        x.date = new Date(((ref.getFullYear() - 30) + l), j, 1);
+        x.date = new Date(((ref.getFullYear() - (span / 2)) + l), j, 1);
         for (i = 0; i < dayInMonthArray[j]; i += 1) {
           // increment the reference day
-          x.date = new Date(((ref.getFullYear() - 30) + l), j, i + 1);
+          x.date = new Date(((ref.getFullYear() - (span / 2)) + l), j, i + 1);
           // set the date's digit of the current day
           x.days[j].push(i + 1);
           // set the day of the week of the current day
@@ -101,8 +94,6 @@ function dateFull(counter) {
       return calLib;
     }
   );
-
-  console.log(calLib[counter]);
 }
 
 const renderY = function renderTheFullYear({ titleElemSup, contentElemSup }) {
@@ -180,8 +171,26 @@ const countDown = function setYearCounterDown() {
   count -= 1;
 };
 
-dateFull(count);
-renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+const initBase = function setUpBaseView() {
+  calInit(200);
+  renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+};
+
+initBase();
+
+$('#next').listen('click', () => {
+  countUp();
+  clear($('#macroContent').dom());
+  clear($('#microContent').dom());
+  renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+});
+$('#prev').listen('click', () => {
+  countDown();
+  clear($('#macroContent').dom());
+  clear($('#microContent').dom());
+  renderY({ titleElemSup: '#macroContent', contentElemSup: '#microContent' });
+});
+
 
 const test = new Date(2016, 1, 1);
 console.log(test);
