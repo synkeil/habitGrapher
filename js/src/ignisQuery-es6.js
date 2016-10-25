@@ -1,13 +1,21 @@
-function iQ(mainSelector, subSelector) {
+function $(mainSelector, subSelector) {
   // seting up shorthands
   let mainS = mainSelector || null;
   let subS = subSelector || null;
-  let main = [];
+  const main = [];
   const sub = [];
   let mainCount = [];
   let subCount = [];
-  let selected = [];
+  const selected = [];
   let count = 0;
+  let a = 0;
+  let b = 0;
+  let c = 0;
+  let d = 0;
+  let f = 0;
+  let g = 0;
+  let i = 0;
+  let temp;
 
   (() => {
     switch (mainS.charAt(0)) {
@@ -20,19 +28,19 @@ function iQ(mainSelector, subSelector) {
         mainS = mainS.slice(1);
         // gets the htmlCollection into mainCount
         mainCount = document.getElementsByClassName(mainS);
-        for (let a = 0; a < mainCount.length; a += 1) {
-          main[a] = document.getElementsByClassName(mainS)[a];
+        for (a = 0; a < mainCount.length; a += 1) {
+          main.push(document.getElementsByClassName(mainS)[a]);
         }
         break;
       default:
         mainCount = document.getElementsByTagName(mainS.toUpperCase());
-        for (let b = 0; b < mainCount.length; b += 1) {
-          main[b] = document.getElementsByTagName(mainS)[b];
+        for (b = 0; b < mainCount.length; b += 1) {
+          main.push(document.getElementsByTagName(mainS)[b]);
         }
     }
     if (subS === null) {
-      for (let c = 0; c < main.length; c += 1) {
-        selected[c] = main[c];
+      for (c = 0; c < main.length; c += 1) {
+        selected.push(main[c]);
       }
       return selected;
     }
@@ -43,11 +51,11 @@ function iQ(mainSelector, subSelector) {
         sub[0] = document.getElementById(subS);
         break;
       case '.':
-      // gets rid of the . in front of the class
+        // gets rid of the . in front of the class
         subS = subS.slice(1);
         // gets the htmlCollection into subCount
         subCount = main.childNodes;
-        for (let d = 0; d < subCount.length; d += 1) {
+        for (d = 0; d < subCount.length; d += 1) {
           if (main.childNodes[d].className !== undefined) {
             if (main.childNodes[d].className.split(' ').indexOf(subS) !== null) {
               sub[count] = main.childNodes[d];
@@ -59,7 +67,7 @@ function iQ(mainSelector, subSelector) {
       default:
         subCount = main.childNodes;
         subS = subS.toUpperCase();
-        for (let f = 0; f < main.childNodes.length; f += 1) {
+        for (f = 0; f < main.childNodes.length; f += 1) {
           if (main.childNodes[f].tagName !== undefined) {
             if (main.childNodes[f].tagName === subS) {
               sub[count] = main.childNodes[f];
@@ -68,19 +76,20 @@ function iQ(mainSelector, subSelector) {
           }
         }
     }
-    for (let g = 0; g < sub.length; g += 1) {
+    for (g = 0; g < sub.length; g += 1) {
       selected[g] = sub[g];
     }
     return selected;
   })();
 
   this.dom = function returnDomElement() {
-    main = main[0];
-    selected = main;
-    return selected;
+    const toSelect = main[0];
+    return toSelect;
   };
 
-  this.eq = function atIndex(iM = null) {
+  this.eq = function atIndex(...theArgs) {
+    const iM = theArgs.length > 0 && theArgs[0] !== undefined ? theArgs[0] : null;
+
     (() => {
       if (iM !== null) {
         selected[0] = selected[iM - 1];
@@ -93,9 +102,13 @@ function iQ(mainSelector, subSelector) {
   };
 
   this.attr = function setAttribut(atr, val) {
-    for (let i = 0; i < selected.length; i += 1) {
-      selected[i].setAttribute(atr, val);
-    }
+    selected.map(
+      (x) => {
+        temp = x;
+        temp.setAttribute(atr, val);
+        return selected;
+      }
+    );
     return this;
   };
 
@@ -105,64 +118,98 @@ function iQ(mainSelector, subSelector) {
 
   // set the css of the iQ in the form of "color:blue;width:125px"
   this.css = function setStyle(style) {
-    for (let i = 0; i < selected.length; i += 1) {
-      selected[i].style.cssText = style;
-    }
+    selected.map(
+      (x) => {
+        temp = x;
+        temp.style.cssText = style;
+        return selected;
+      }
+    );
     return this;
   };
 
   this.addClass = function addClassToElement(toAdd) {
-    for (let i = 0; i < selected.length; i += 1) {
-      selected[i].classList.add(toAdd);
-    }
+    selected.map(
+      (x) => {
+        temp = x;
+        temp.classList.add(toAdd);
+        return selected;
+      }
+    );
     return this;
   };
 
   this.removeClass = function removeClassFromElement(toRemove) {
-    for (let i = 0; i < selected.length; i += 1) {
-      selected[i].classList.remove(toRemove);
-    }
+    selected.map(
+      (x) => {
+        temp = x;
+        temp.classList.remove(toRemove);
+        return selected;
+      }
+    );
     return this;
   };
 
   // returns the content of iQ if a is empty, else sets it to a
-  this.html = function setContentAbsolutly(a = null) {
+  this.html = function setContentAbsolutly(...theArgs) {
+    a = theArgs.length > 0 && theArgs[0] !== undefined ? theArgs[0] : null;
+
     if (a === null) {
       return selected.innerHTML;
     }
-    for (let i = 0; i < selected.length; i += 1) {
-      selected[i].innerHTML = a;
-    }
+    selected.map(
+      (x) => {
+        temp = x;
+        temp.innerHTML = a;
+        return selected;
+      }
+    );
     return this;
   };
 
-  this.val = function returnElemValue(a = null) {
+  this.val = function returnElemValue(...theArgs) {
+    a = theArgs.length > 0 && theArgs[0] !== undefined ? theArgs[0] : null;
+
     if (a === null) {
       return selected[0].value;
     }
-    for (let i = 0; i < selected.length; i += 1) {
-      selected[i].value = a;
-    }
+    selected.map(
+      (x) => {
+        temp = x;
+        temp.value = a;
+        return selected;
+      }
+    );
     return this;
   };
 
   // adds an event listener in the form of element.addEventListener(type, listener);
-  this.listen = function addEventListener(evnt, func) {
-    for (let i = 0; i < selected.length; i += 1) {
-      selected[i].addEventListener(evnt, func);
-    }
+  this.listen = function addEvent(evnt, func) {
+    selected.map(
+      (x) => {
+        temp = x;
+        temp.addEventListener(evnt, func);
+        return selected;
+      }
+    );
     return this;
   };
 
   // add your code to the html of iQ
   this.append = function addContentToExisting(code) {
-    for (let i = 0; i < selected.length; i += 1) {
-      selected[i].innerHTML += code;
-    }
+    selected.map(
+      (x) => {
+        temp = x;
+        temp.innerHTML += code;
+        return selected;
+      }
+    );
     return this;
   };
 
-  this.ajax = function getAndPost(options = {}) {
+  this.ajax = function getAndPost(...theArgs) {
+    const options = theArgs.length > 0 && theArgs[0] !== undefined ? theArgs[0] : {};
+
     const url = options.url || alert('You need to specify a url');
     const method = options.methods || 'GET';
     const data = options.data || '';
@@ -177,7 +224,7 @@ function iQ(mainSelector, subSelector) {
       xmlhttp.onreadystatechange = function whenChangeHappen() {
         if (xmlhttp.readyState === XMLHttpRequest.DONE) {
           if (xmlhttp.status === 200) {
-            for (let i = 0; i < selected.length; i += 1) {
+            for (i = 0; i < selected.length; i += 1) {
               selected[i].innerHTML += xmlhttp.response;
             }
           } else if (xmlhttp.status === 400) {

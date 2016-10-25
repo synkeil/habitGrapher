@@ -8,6 +8,14 @@ function $(mainSelector, subSelector) {
   var subCount = [];
   var selected = [];
   var count = 0;
+  var a = 0;
+  var b = 0;
+  var c = 0;
+  var d = 0;
+  var f = 0;
+  var g = 0;
+  var i = 0;
+  var temp = void 0;
 
   (function () {
     switch (mainS.charAt(0)) {
@@ -20,19 +28,19 @@ function $(mainSelector, subSelector) {
         mainS = mainS.slice(1);
         // gets the htmlCollection into mainCount
         mainCount = document.getElementsByClassName(mainS);
-        for (var a = 0; a < mainCount.length; a += 1) {
-          main[a] = document.getElementsByClassName(mainS)[a];
+        for (a = 0; a < mainCount.length; a += 1) {
+          main.push(document.getElementsByClassName(mainS)[a]);
         }
         break;
       default:
         mainCount = document.getElementsByTagName(mainS.toUpperCase());
-        for (var b = 0; b < mainCount.length; b += 1) {
-          main[b] = document.getElementsByTagName(mainS)[b];
+        for (b = 0; b < mainCount.length; b += 1) {
+          main.push(document.getElementsByTagName(mainS)[b]);
         }
     }
     if (subS === null) {
-      for (var c = 0; c < main.length; c += 1) {
-        selected[c] = main[c];
+      for (c = 0; c < main.length; c += 1) {
+        selected.push(main[c]);
       }
       return selected;
     }
@@ -47,7 +55,7 @@ function $(mainSelector, subSelector) {
         subS = subS.slice(1);
         // gets the htmlCollection into subCount
         subCount = main.childNodes;
-        for (var d = 0; d < subCount.length; d += 1) {
+        for (d = 0; d < subCount.length; d += 1) {
           if (main.childNodes[d].className !== undefined) {
             if (main.childNodes[d].className.split(' ').indexOf(subS) !== null) {
               sub[count] = main.childNodes[d];
@@ -59,7 +67,7 @@ function $(mainSelector, subSelector) {
       default:
         subCount = main.childNodes;
         subS = subS.toUpperCase();
-        for (var f = 0; f < main.childNodes.length; f += 1) {
+        for (f = 0; f < main.childNodes.length; f += 1) {
           if (main.childNodes[f].tagName !== undefined) {
             if (main.childNodes[f].tagName === subS) {
               sub[count] = main.childNodes[f];
@@ -68,20 +76,19 @@ function $(mainSelector, subSelector) {
           }
         }
     }
-    for (var g = 0; g < sub.length; g += 1) {
+    for (g = 0; g < sub.length; g += 1) {
       selected[g] = sub[g];
     }
     return selected;
   })();
 
   this.dom = function returnDomElement() {
-    main = main[0];
-    selected = main;
-    return selected;
+    var toSelect = main[0];
+    return toSelect;
   };
 
   this.eq = function atIndex() {
-    var iM = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+    var iM = arguments.length > 0 && (arguments.length <= 0 ? undefined : arguments[0]) !== undefined ? arguments.length <= 0 ? undefined : arguments[0] : null;
 
     (function () {
       if (iM !== null) {
@@ -95,9 +102,11 @@ function $(mainSelector, subSelector) {
   };
 
   this.attr = function setAttribut(atr, val) {
-    for (var i = 0; i < selected.length; i += 1) {
-      selected[i].setAttribute(atr, val);
-    }
+    selected.map(function (x) {
+      temp = x;
+      temp.setAttribute(atr, val);
+      return selected;
+    });
     return this;
   };
 
@@ -107,69 +116,83 @@ function $(mainSelector, subSelector) {
 
   // set the css of the iQ in the form of "color:blue;width:125px"
   this.css = function setStyle(style) {
-    for (var i = 0; i < selected.length; i += 1) {
-      selected[i].style.cssText = style;
-    }
+    selected.map(function (x) {
+      temp = x;
+      temp.style.cssText = style;
+      return selected;
+    });
     return this;
   };
 
   this.addClass = function addClassToElement(toAdd) {
-    for (var i = 0; i < selected.length; i += 1) {
-      selected[i].classList.add(toAdd);
-    }
+    selected.map(function (x) {
+      temp = x;
+      temp.classList.add(toAdd);
+      return selected;
+    });
     return this;
   };
 
   this.removeClass = function removeClassFromElement(toRemove) {
-    for (var i = 0; i < selected.length; i += 1) {
-      selected[i].classList.remove(toRemove);
-    }
+    selected.map(function (x) {
+      temp = x;
+      temp.classList.remove(toRemove);
+      return selected;
+    });
     return this;
   };
 
   // returns the content of iQ if a is empty, else sets it to a
   this.html = function setContentAbsolutly() {
-    var a = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+    a = arguments.length > 0 && (arguments.length <= 0 ? undefined : arguments[0]) !== undefined ? arguments.length <= 0 ? undefined : arguments[0] : null;
 
     if (a === null) {
       return selected.innerHTML;
     }
-    for (var i = 0; i < selected.length; i += 1) {
-      selected[i].innerHTML = a;
-    }
+    selected.map(function (x) {
+      temp = x;
+      temp.innerHTML = a;
+      return selected;
+    });
     return this;
   };
 
   this.val = function returnElemValue() {
-    var a = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+    a = arguments.length > 0 && (arguments.length <= 0 ? undefined : arguments[0]) !== undefined ? arguments.length <= 0 ? undefined : arguments[0] : null;
 
     if (a === null) {
       return selected[0].value;
     }
-    for (var i = 0; i < selected.length; i += 1) {
-      selected[i].value = a;
-    }
+    selected.map(function (x) {
+      temp = x;
+      temp.value = a;
+      return selected;
+    });
     return this;
   };
 
   // adds an event listener in the form of element.addEventListener(type, listener);
-  this.listen = function addEventListener(evnt, func) {
-    for (var i = 0; i < selected.length; i += 1) {
-      selected[i].addEventListener(evnt, func);
-    }
+  this.listen = function addEvent(evnt, func) {
+    selected.map(function (x) {
+      temp = x;
+      temp.addEventListener(evnt, func);
+      return selected;
+    });
     return this;
   };
 
   // add your code to the html of iQ
   this.append = function addContentToExisting(code) {
-    for (var i = 0; i < selected.length; i += 1) {
-      selected[i].innerHTML += code;
-    }
+    selected.map(function (x) {
+      temp = x;
+      temp.innerHTML += code;
+      return selected;
+    });
     return this;
   };
 
   this.ajax = function getAndPost() {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var options = arguments.length > 0 && (arguments.length <= 0 ? undefined : arguments[0]) !== undefined ? arguments.length <= 0 ? undefined : arguments[0] : {};
 
     var url = options.url || alert('You need to specify a url');
     var method = options.methods || 'GET';
@@ -185,7 +208,7 @@ function $(mainSelector, subSelector) {
       xmlhttp.onreadystatechange = function whenChangeHappen() {
         if (xmlhttp.readyState === XMLHttpRequest.DONE) {
           if (xmlhttp.status === 200) {
-            for (var i = 0; i < selected.length; i += 1) {
+            for (i = 0; i < selected.length; i += 1) {
               selected[i].innerHTML += xmlhttp.response;
             }
           } else if (xmlhttp.status === 400) {
