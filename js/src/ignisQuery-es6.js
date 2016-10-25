@@ -240,5 +240,15 @@ function $(mainSelector, subSelector) {
       xmlhttp.send(data);
     }
   };
+
+  this.index = function getIndexOfElement() {
+    const children = selected.parentNode.childNodes;
+    let num = 0;
+    for (i = 0; i < children.length; i += 1) {
+      if (children[i] === selected) return num;
+      if (children[i].nodeType === 1) num += 1;
+    }
+    return -1;
+  };
   return this;
 }

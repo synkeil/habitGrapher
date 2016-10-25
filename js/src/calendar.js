@@ -246,6 +246,16 @@ const countDown = function setYearCounterDown() {
   }
 };
 
+const getIndex = function getTheIndexOfCurrentElement(elem) {
+  const children = elem.parentNode.childNodes;
+  let num = 0;
+  for (i = 0; i < children.length; i += 1) {
+    if (children[i] === elem) return num;
+    if (children[i].nodeType === 1) num += 1;
+  }
+  return num;
+};
+
 const build = function initTheCalAndRender(first, second) {
   clear($(first).dom());
   clear($(second).dom());
@@ -267,6 +277,14 @@ const build = function initTheCalAndRender(first, second) {
     default:
       renderDay({ titleElemSup: first, contentElemSup: second });
   }
+
+  // display clicked month
+  $('.monthCell').listen('click', function listenToMonth() {
+    mCount = getIndex(this);
+    mode = 2;
+    build('#macroContent', '#microContent');
+    console.log(mCount);
+  });
 };
 
 const initBase = function setUpBaseView() {
@@ -274,22 +292,14 @@ const initBase = function setUpBaseView() {
   build('#macroContent', '#microContent');
 };
 
-$('#fancyButton').listen('click', () => {
-  mode = 1; build('#macroContent', '#microContent');
-});
+initBase();
+
 $('#yearButton').listen('click', () => {
   mode = 0; build('#macroContent', '#microContent');
 });
 $('#monthButton').listen('click', () => {
   mode = 2; build('#macroContent', '#microContent');
 });
-$('#weekButton').listen('click', () => {
-  mode = 3; build('#macroContent', '#microContent');
-});
-$('#dayButton').listen('click', () => {
-  mode = 4; build('#macroContent', '#microContent');
-});
-
 $('#next').listen('click', () => {
   countUp();
   build('#macroContent', '#microContent');
@@ -299,7 +309,10 @@ $('#prev').listen('click', () => {
   build('#macroContent', '#microContent');
 });
 
-initBase();
 
-// const test = new Date(2016, 1, 1);
-// console.log(test);
+$('.monthCell').listen('click', function() {
+  mCount = getIndex(this);
+  mode = 2;
+  build('#macroContent', '#microContent');
+  console.log(mCount);
+});
