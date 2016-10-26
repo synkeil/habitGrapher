@@ -239,10 +239,25 @@
 	    i += 1;
 	    return curYear.dayName[mCount];
 	  });
-	  console.log(curYear);
 	};
-	var renderWeek = function renderWeekDetailedView() {};
-	var renderDay = function renderDayDetailedView() {};
+	var renderWeek = function renderWeekDetailedView(_ref3) {
+	  var first = _ref3.titleElemSup,
+	      second = _ref3.contentElemSup;
+
+	  var curYear = calLib[count];
+	  var curMonth = curYear.dayName[mCount];
+
+	  // display week
+	  $(first).append(monthArr[mCount]);
+	};
+	var renderDay = function renderDayDetailedView(_ref4) {
+	  var first = _ref4.titleElemSup,
+	      second = _ref4.contentElemSup;
+
+	  var curYear = calLib[count];
+	  var curMonth = curYear.dayName[mCount];
+	  var curDay = curMonth[dCount];
+	};
 
 	// counter management
 	var countUp = function setYearCounterUp() {
@@ -304,7 +319,7 @@
 	  return num;
 	};
 
-	var build = function initTheCalAndRender(first, second) {
+	var build = function initTheCalAndRender(first, second, third) {
 	  clear($(first).dom());
 	  clear($(second).dom());
 
@@ -326,12 +341,25 @@
 	      renderDay({ titleElemSup: first, contentElemSup: second });
 	  }
 
-	  // display clicked month
+	  /*
+	    // listeners to get the index of the selected day/month/year
+	  */
+
+	  // month in year mode
 	  $('.monthCell').listen('click', function listenToMonth() {
 	    mCount = getIndex(this);
 	    mode = 2;
 	    build('#macroContent', '#microContent');
 	    console.log(mCount);
+	  });
+	  // Day in month mode
+	  $('.mvDayCell').listen('click', function listenToDayInM() {
+	    dCount = getIndex(this);
+	    mode = 3;
+	    // build('#macroContent', '#microContent');
+	    $('p').removeClass('selectedDayDigit');
+	    this.childNodes[1].classList.add('selectedDayDigit');
+	    console.log(dCount);
 	  });
 	};
 
@@ -357,7 +385,7 @@
 	  build('#macroContent', '#microContent');
 	});
 
-	$('.monthCell').listen('click', function () {
+	$('.monthCell').listen('click', function listenForClickInYearView() {
 	  mCount = getIndex(this);
 	  mode = 2;
 	  build('#macroContent', '#microContent');

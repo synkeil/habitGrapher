@@ -9,22 +9,27 @@
   <title>calendar</title>
 </head>
 <body>
-  <div>
-    <button id="fancyButton">Fancy</button>
-    <button id="yearButton">Year</button>
-    <button id="monthButton">Month</button>
-    <button id="weekButton">Week</button>
-    <button id="dayButton">Day</button>
-  </div>
-  <section id="calendarProper" class="js-calendar">
-    <div id="calHeader">
-      <div id="prev"><</div>
-      <p id="macroContent"></p>
-      <div id="next">></div>
-    </div>
-    <div id="microContent">
-    </div>
-  </section>
+  <main id="wrapperCalendar">
+    <section id="detailsPanel">
+
+    </section>
+    <section id="calendarProper" class="js-calendar">
+      <div id="buttons">
+        <button id="fancyButton">Fancy</button>
+        <button id="yearButton">Year</button>
+        <button id="monthButton">Month</button>
+        <button id="weekButton">Week</button>
+        <button id="dayButton">Day</button>
+      </div>
+      <div id="calHeader">
+        <div id="prev"><</div>
+        <p id="macroContent"></p>
+        <div id="next">></div>
+      </div>
+      <div id="microContent">
+      </div>
+    </section>
+  </main>
 </body>
 <script src="../../js/dist/iQ.js" charset="utf-8"></script>
 <script src="../../js/dist/bundle.js" charset="utf-8"></script>

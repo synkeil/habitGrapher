@@ -191,10 +191,25 @@ const renderMonth = function renderMonthDetailedView({
       return curYear.dayName[mCount];
     }
   );
-  console.log(curYear);
 };
-const renderWeek = function renderWeekDetailedView() {};
-const renderDay = function renderDayDetailedView() {};
+const renderWeek = function renderWeekDetailedView({
+  titleElemSup: first,
+  contentElemSup: second,
+}) {
+  const curYear = calLib[count];
+  const curMonth = curYear.dayName[mCount];
+
+  // display week
+  $(first).append(monthArr[mCount]);
+};
+const renderDay = function renderDayDetailedView({
+  titleElemSup: first,
+  contentElemSup: second,
+}) {
+  const curYear = calLib[count];
+  const curMonth = curYear.dayName[mCount];
+  const curDay = curMonth[dCount];
+};
 
 // counter management
 const countUp = function setYearCounterUp() {
@@ -256,7 +271,7 @@ const getIndex = function getTheIndexOfCurrentElement(elem) {
   return num;
 };
 
-const build = function initTheCalAndRender(first, second) {
+const build = function initTheCalAndRender(first, second, third) {
   clear($(first).dom());
   clear($(second).dom());
 
@@ -278,12 +293,25 @@ const build = function initTheCalAndRender(first, second) {
       renderDay({ titleElemSup: first, contentElemSup: second });
   }
 
-  // display clicked month
+  /*
+    // listeners to get the index of the selected day/month/year
+  */
+
+  // month in year mode
   $('.monthCell').listen('click', function listenToMonth() {
     mCount = getIndex(this);
     mode = 2;
     build('#macroContent', '#microContent');
     console.log(mCount);
+  });
+  // Day in month mode
+  $('.mvDayCell').listen('click', function listenToDayInM() {
+    dCount = getIndex(this);
+    mode = 3;
+    // build('#macroContent', '#microContent');
+    $('p').removeClass('selectedDayDigit');
+    this.childNodes[1].classList.add('selectedDayDigit');
+    console.log(dCount);
   });
 };
 
@@ -310,7 +338,7 @@ $('#prev').listen('click', () => {
 });
 
 
-$('.monthCell').listen('click', function() {
+$('.monthCell').listen('click', function listenForClickInYearView() {
   mCount = getIndex(this);
   mode = 2;
   build('#macroContent', '#microContent');
